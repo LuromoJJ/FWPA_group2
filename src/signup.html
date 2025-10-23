@@ -1,0 +1,68 @@
+  <!-- Dominik Szewczyk -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up - MedInfo</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/signup.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="logo">
+      <a href="index.html">
+        <img src="assets/images/logo.png" alt="Logo">
+        <span>MedInfo</span>
+      </a>
+    </div>
+    <nav class="nav-links">
+      <a href="login.html" class="login-btn">Login</a>
+    </nav>
+  </header>
+
+  <!-- Signup Section -->
+  <main class="signup-section">
+    <div class="signup-card">
+      <h1>Create your account</h1>
+      <p class="subtitle">Join MedInfo to manage your medicines easily.</p>
+
+      <form class="signup-form" action="#" method="post">
+        <div class="form-group">
+          <label for="fullname">Full Name</label>
+          <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" required />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Create a password" required />
+        </div>
+
+        <div class="form-group">
+          <label for="confirm-password">Confirm Password</label>
+          <input type="password" id="confirm-password" name="confirm-password" placeholder="Re-enter password" required />
+        </div>
+
+        <button type="submit" class="signup-btn">Sign Up</button>
+
+        <p class="login-text">
+          Already have an account? <a href="login.html">Log in</a>
+        </p>
+      </form>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 Medicine Explainer & Reminder. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,121 @@
+/* Dominik Szewczyk */
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background-color: #f6f8f3; /* light background */
+  color: #222;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Color palette */
+:root {
+  --green-dark: #90A955;
+  --green-mid: #ADC178;
+  --green-light: #B3D89C;
+  --text-dark: #2d2d2d;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem 3rem;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--green-dark);
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+.logo img {
+  width: 35px;
+  margin-right: 10px;
+}
+
+.login-btn {
+  background-color: var(--green-dark);
+  color: white;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.login-btn:hover {
+  background-color: var(--green-mid);
+}
+
+/* Hero section */
+.hero {
+  text-align: center;
+  margin-top: 10vh;
+  flex: 1;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--green-dark);
+}
+
+/* Search form */
+.search-form {
+  display: inline-flex;
+  align-items: center;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.search-form input {
+  border: none;
+  padding: 1rem 1.2rem;
+  width: 320px;
+  font-size: 1rem;
+  outline: none;
+  background-color: #fdfdfd;
+}
+
+.search-form button {
+  background-color: var(--green-dark);
+  color: white;
+  border: none;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.search-form button:hover {
+  background-color: var(--green-mid);
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: var(--green-light);
+  font-size: 0.9rem;
+  color: var(--text-dark);
+  border-top: 3px solid #cddcb5;
+}

@@ -1,0 +1,82 @@
+<!-- Dominik Szewczyk -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Medicine Info - Aspirin</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/medicine.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="logo">
+      <a href="index.html">
+        <img src="assets/images/logo.png" alt="Logo">
+        <span>MedInfo</span>
+      </a>
+    </div>
+    <nav class="nav-links">
+      <a href="profile.html" class="profile-icon">
+        <!-- ✅ Use a working default icon or fallback -->
+        <img src="assets/icons/user-icon.svg" alt="Profile" onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png';">
+      </a>
+    </nav>
+  </header>
+
+  <!-- Search Section -->
+  <section class="search-section">
+    <h2>Check your medicine</h2>
+    <form class="search-form">
+      <input type="text" placeholder="Search for another medicine..." name="medicine" />
+      <button type="submit">Search</button>
+    </form>
+  </section>
+
+  <!-- Medicine Info Section -->
+  <main class="medicine-info">
+    <div class="medicine-header">
+      <h1>Aspirin</h1>
+      <a href="#" class="add-profile-btn">+ Add to My Profile</a>
+    </div>
+
+    <div class="medicine-description">
+      <p>
+        Aspirin (acetylsalicylic acid) is commonly used to reduce pain, fever, or inflammation. 
+        It can also help prevent heart attacks and strokes by reducing blood clotting. 
+        It should be taken with food or water and never on an empty stomach.
+      </p>
+    </div>
+
+    <div class="medicine-extra">
+      <div class="advice-box">
+        <h3>💡 Advice</h3>
+        <p>Take with food or milk to reduce stomach irritation. Avoid alcohol while using this medicine.</p>
+      </div>
+
+      <div class="warning-box">
+        <h3>⚠️ Warning</h3>
+        <p>Do not mix with other blood-thinning medications. Avoid use if you have ulcers or bleeding disorders.</p>
+      </div>
+    </div>
+
+    <!-- PubMed section -->
+    <div class="pubmed-link">
+      <p>
+        For more details, see 
+        <a href="https://pubmed.ncbi.nlm.nih.gov/?term=aspirin" target="_blank">
+          official PubMed entries for Aspirin.
+        </a>
+      </p>
+    </div>
+  </main>
+
+  <!-- ✅ Footer (bottom bar) -->
+  <footer class="footer">
+    <p>© 2025 Medicine Explainer & Reminder. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

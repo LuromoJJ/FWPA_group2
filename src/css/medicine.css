@@ -1,0 +1,171 @@
+/* Dominik Szewczyk */
+/* Search section */
+.search-section {
+  background-color: var(--green-mid);
+  padding: 3.5rem 0 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.search-section h2 {
+  color: white;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.search-section .search-form {
+  display: flex;
+  align-items: center;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+
+.search-section input {
+  border: none;
+  padding: 0.9rem 1rem;
+  width: 320px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.search-section button {
+  background-color: var(--green-dark);
+  color: white;
+  border: none;
+  padding: 0.9rem 1.2rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.search-section button:hover {
+  background-color: var(--green-light);
+}
+
+/* Medicine info layout */
+.medicine-info {
+  max-width: 900px;
+  margin: 3rem auto;
+  padding: 0 2rem;
+}
+
+.medicine-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.medicine-header h1 {
+  font-size: 2.3rem;
+  color: var(--green-dark);
+}
+
+.add-profile-btn {
+  background-color: var(--green-dark);
+  color: white;
+  text-decoration: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.add-profile-btn:hover {
+  background-color: var(--green-mid);
+}
+
+/* Medicine description */
+.medicine-description {
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+/* Advice & warning boxes */
+.medicine-extra {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.advice-box, .warning-box {
+  flex: 1;
+  padding: 1rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.advice-box {
+  border: 2px solid var(--green-dark);
+  background-color: #f9fff6;
+}
+
+.warning-box {
+  border: 2px solid #d9534f;
+  background-color: #fff6f6;
+}
+
+.advice-box h3, .warning-box h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+/* PubMed link section */
+.pubmed-link {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 1.1rem;
+}
+
+.pubmed-link a {
+  color: var(--green-dark);
+  font-weight: 600;
+  text-decoration: underline;
+  transition: color 0.3s;
+}
+
+.pubmed-link a:hover {
+  color: #6c8b3e;
+}
+
+/* Profile icon */
+.profile-icon img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.profile-icon img:hover {
+  opacity: 0.8;
+}
+/* Make the page take full height and footer at bottom */
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* full viewport height */
+  margin: 0;
+}
+
+main {
+  flex: 1; /* take remaining space */
+}
+
+/* Footer styling (optional) */
+.footer {
+  background-color: var(--green-dark);
+  color: white;
+  text-align: center;
+  padding: 1rem 0;
+  font-size: 0.9rem;
+}

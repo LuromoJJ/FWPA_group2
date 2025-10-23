@@ -1,0 +1,65 @@
+<!-- Dominik Szewczyk -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login - MedInfo</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/login.css" />
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="logo">
+      <a href="index.html">
+        <img src="assets/images/logo.png" alt="Logo">
+        <span>MedInfo</span>
+      </a>
+    </div>
+    <nav class="nav-links">
+      <a href="signup.html" class="login-btn">Sign Up</a>
+    </nav>
+  </header>
+
+  <!-- Login Section -->
+  <main class="login-section">
+    <div class="login-card">
+      <h1>Welcome back</h1>
+      <p class="subtitle">Log in to access your medication profile.</p>
+
+      <form class="login-form" action="#" method="post">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter your password" required />
+        </div>
+
+        <div class="form-options">
+          <label class="remember">
+            <input type="checkbox" name="remember" />
+            Remember me
+          </label>
+          <a href="forgot-password.html" class="forgot-link">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="login-btn-main">Login</button>
+
+        <p class="signup-text">
+          Don't have an account? <a href="signup.html">Sign up</a>
+        </p>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2025 Medicine Explainer & Reminder. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

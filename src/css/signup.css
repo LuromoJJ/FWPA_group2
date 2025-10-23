@@ -1,0 +1,101 @@
+/* Dominik Szewczyk */
+/* Signup Section */
+.signup-section {
+  background: linear-gradient(to bottom, var(--green-mid), var(--green-light));
+  min-height: 90vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+/* Signup Card */
+.signup-card {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.signup-card h1 {
+  color: var(--green-dark);
+  margin-bottom: 0.5rem;
+  font-size: 1.8rem;
+}
+
+.signup-card .subtitle {
+  color: #555;
+  margin-bottom: 1.8rem;
+  font-size: 0.95rem;
+}
+
+/* Form Styles */
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  text-align: left;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: var(--green-dark);
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: 0.3s;
+}
+
+.form-group input:focus {
+  border-color: var(--green-dark);
+  outline: none;
+  box-shadow: 0 0 5px rgba(144, 169, 85, 0.4);
+}
+
+/* Button */
+.signup-btn {
+  background-color: var(--green-dark);
+  color: white;
+  border: none;
+  padding: 0.9rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.signup-btn:hover {
+  background-color: var(--green-mid);
+}
+
+/* Login text */
+.login-text {
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.login-text a {
+  color: var(--green-dark);
+  text-decoration: underline;
+  font-weight: 600;
+}
+
+.login-text a:hover {
+  color: #6c8b3e;
+}
