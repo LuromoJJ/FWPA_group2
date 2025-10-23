@@ -1,0 +1,43 @@
+
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 90vh; 
+    background-color: #f0f0f0;
+  }
+  .forgot-password-container {
+    padding: 40px 80px;
+    background-color: lightblue;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  input[type="email"], button {
+    padding: 10px;
+    margin-top: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #0056b3;
+  }
+  .footer-seprator {
+    height: 30px;
+    background-color: #ccc;
+    margin: 40px 0;
+  }
