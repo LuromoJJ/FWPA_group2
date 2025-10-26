@@ -226,7 +226,7 @@ html, body {
 }
 @media (max-width: 900px) {
   .profile-top {
-      grid-template-columns: 1fr; /* stack vertically */
+      grid-template-columns: 1fr; 
       gap: 20px;
   }
 }
