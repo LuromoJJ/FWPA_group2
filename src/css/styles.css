@@ -8,6 +8,14 @@ html, body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
+    color: #333;
+  }
+  h3{
+    font-weight: 600;
+  }
+  li{
+    font-size:1rem;
   }
   .container {
     display: flex;
@@ -120,3 +128,105 @@ html, body {
     font-weight: 600;
     transition: 0.3s;
   }
+
+  /* Profile page styles */
+.header_seperator_profile {
+    height: 100px;
+    background-color: #adc178;
+    color: black;
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    gap: 50px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+
+.profile-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr; 
+    gap: 30px;                          
+    padding: 20px;
+    align-items: start;                 
+}
+
+.user-information-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border: 1px solid black;
+    padding: 20px;
+    border-radius: 10px;
+    background: #d9eaff;
+}
+
+.profile_icon img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid #aaa;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+.saved-medicines {
+    border: 3px solid #abc178;
+    padding: 20px;
+    border-radius: 10px;
+    background: #e2f0d9;
+}
+
+.Warnings {
+    border: 3px solid red;
+    padding: 20px;
+    border-radius: 10px;
+    background: #ffe2e2;
+}
+
+.Calendar {
+    margin-top: 30px;
+    margin-bottom: 50px;
+    border: 1px solid black;
+    padding: 20px;
+    border-radius: 10px;
+    background: #f9f2e2;
+}
+.footer-separator_profile {
+    height: 150px;
+    background-color: #adc178;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.user-information-section h3,
+.saved-medicines h3,
+.Warnings h3,
+.Calendar h3 {
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    color: #333;
+}
+
+.user-information-section ul,
+.saved-medicines ul,
+.Warnings ul,
+.Calendar ul {
+    margin: 0;
+    padding-left: 20px;
+    line-height: 1.6;
+}
+.saved-medicines,
+.Warnings,
+.Calendar,
+.user-information-section {
+    border-top: 4px solid #ccc; 
+}
+@media (max-width: 900px) {
+  .profile-top {
+      grid-template-columns: 1fr; /* stack vertically */
+      gap: 20px;
+  }
+}
