@@ -21,7 +21,7 @@ app = Flask(__name__,
             template_folder=TEMPLATE_DIR,
             static_folder=STATIC_DIR,
             static_url_path='')
-app.secret_key = 'your-secret-key-change-this-in-production'
+app.secret_key = 'key123'
 
 # Debug: Print paths
 print(f"Template folder: {TEMPLATE_DIR}")
