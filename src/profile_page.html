@@ -4,14 +4,15 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Profile_page</title>
-        <link href="css/styles.css" rel="stylesheet"/>
+        <link href="/css/main.css" rel="stylesheet"/>
+        <link href="/css/styles.css" rel="stylesheet"/>
     </head>
     <body>
         <header>
             <div class="header_seperator_profile">
                     <div class="logo">
-                        <a href="homepage.html">
-                            <img src="assets/images/logo.png" alt="Medicine Explainer Logo">
+                        <a href="/">
+                            <img src="/assets/images/logo.png" alt="Medicine Explainer Logo">
                             <span>MedInfo</span>
                         </a>
                     </div>
@@ -23,51 +24,64 @@
         <div class="profile-top">
             <div class="user-information-section">
                 <div class="profile_icon">
-                    <a href="edit_profile_page.html">
-                        <img src="assets/images/profile_icon.png" alt="Profile Icon">
+                    <a href="/form">
+                        <img src="/assets/images/Profile_icon.png" alt="Profile Icon">
                     </a>
                 </div>
                 <div class="User_information">
                     <h3>User Information:</h3>
                     <ul>
-                        <li>Name: User_Name</li>
-                        <li>Weight: User_Weight</li>
-                        <li>Allergies: User_Allergies</li>
-                        <li>Prescriptions: User_Medical_history</li>
-                        <li>Gender: User_Gender</li>
+                        <li>Name: {{ user.username }}</li>
+                        <li>Email: {{ user.email }}</li>
+                        <li>Weight: Not set</li>
+                        <li>Allergies: Not set</li>
+                        <li>Prescriptions: Not set</li>
+                        <li>Gender: Not set</li>
                     </ul>
+                    <small style="color: #666; font-style: italic;">Click profile icon above to edit your information</small>
                 </div>
             </div>
         
             <div class="saved-medicines">
                 <h3>Saved Medicines💊:</h3>
+                {% if saved_medicines %}
                 <ul>
-                    <li>Aspirin</li>
-                    <li>Ibuprofen</li>
-                    <li>Paracetamol</li>
+                    {% for medicine in saved_medicines %}
+                    <li>
+                        <a href="/medicine/{{ medicine.name.lower() }}" style="text-decoration: none; color: #333;">
+                            {{ medicine.name }}
+                        </a>
+                    </li>
+                    {% endfor %}
                 </ul>
+                {% else %}
+                <p style="color: #666;">No saved medicines yet. <a href="/">Search for medicines</a> to add them!</p>
+                {% endif %}
             </div>
         
             <div class="Warnings">
                 <h3>Warnings⚠️:</h3>
                 <ul>
-                    <li>Warning 1: Interaction between Aspirin and Ibuprofen.</li>
-                    <li>Warning 2: Allergy alert for Penicillin.</li>
+                    <li>No warnings at this time.</li>
                 </ul>
+                <small style="color: #666; font-style: italic;">Warnings will appear here based on your saved medicines and allergies</small>
             </div>
         </div>
         
         <div class="Calendar">
             <h3>Medicine Schedule🗓️:</h3>
             <ul>
-                <li>Aspirin: Daily at 8:00 AM</li>
-                <li>Ibuprofen: Every 6 hours as needed</li>
+                <li>No scheduled medicines yet.</li>
             </ul>
+            <small style="color: #666; font-style: italic;">You can set reminders for your medicines here (coming soon!)</small>
         </div>
     </body>
     <footer>
         <div class="footer-separator_profile">
             <p>&copy; All information to Medinfo.</p>
+            <form method="POST" action="/logout" style="display: inline; margin-left: 20px;">
+                <button type="submit" style="background-color: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer;">Logout</button>
+            </form>
         </div>
     </footer>
 </html>

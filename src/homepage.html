@@ -1,4 +1,4 @@
-  <!-- Dominik Szewczyk -->
+<!-- Dominik Szewczyk -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,13 +12,25 @@
   <!-- Header -->
   <header class="navbar">
     <div class="logo">
-      <a href="index.html">
+      <a href="homepage.html">
         <img src="assets/images/logo.png" alt="Medicine Explainer Logo">
         <span>MedInfo</span>
       </a>
     </div>
-    <nav class="nav-links">
-      <a href="login.html" class="login-btn">Login</a>
+    <nav class="nav-links" style="display: flex; align-items: center; gap: 15px;">
+      {% if user.logged_in %}
+        <!-- Logged in: Show Profile icon (left) and Logout button (right) -->
+        <a href="/profile" style="display: flex; flex-direction: column; align-items: center; text-decoration: none;">
+          <img src="assets/images/Profile_icon.png" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%;">
+          <span style="font-size: 0.75rem; color: #333; margin-top: 5px;">Go to your profile</span>
+        </a>
+        <form method="POST" action="/logout" style="display: inline; margin: 0;">
+          <button type="submit" class="login-btn" style="background-color: #dc3545; border: none; cursor: pointer;">Logout</button>
+        </form>
+      {% else %}
+        <!-- Not logged in: Show Login button -->
+        <a href="/login" class="login-btn">Login</a>
+      {% endif %}
     </nav>
   </header>
 
@@ -26,7 +38,7 @@
   <main class="hero">
     <h1>Check your medicine</h1>
 
-    <form class="search-form">
+    <form class="search-form" method="POST" action="/search">
       <input 
         type="text" 
         placeholder="Enter medicine name..." 
@@ -44,4 +56,3 @@
 
 </body>
 </html>
-

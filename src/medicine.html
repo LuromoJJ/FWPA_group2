@@ -4,33 +4,42 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Medicine Info - Aspirin</title>
-  <link rel="stylesheet" href="css/main.css" />
-  <link rel="stylesheet" href="css/medicine.css" />
+  <title>Medicine Info - {{ medicine.name }}</title>
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/medicine.css" />
 </head>
 <body>
 
-  <!-- Navbar -->
+<!-- Navbar -->
   <header class="navbar">
     <div class="logo">
-      <a href="index.html">
-        <img src="assets/images/logo.png" alt="Logo">
+      <a href="/homepage.html">
+        <img src="/assets/images/logo.png" alt="Logo">
         <span>MedInfo</span>
       </a>
     </div>
-    <nav class="nav-links">
-      <a href="profile_page.html" class="profile-icon">
-        <!-- ✅ Use a working default icon or fallback -->
-        <img src="assets/icons/user-icon.svg" alt="Profile" onerror="this.src='https://cdn-icons-png.flaticon.com/512/847/847969.png';">
-      </a>
+    <nav class="nav-links" style="display: flex; align-items: center; gap: 15px;">
+      {% if user.logged_in %}
+        <!-- Logged in: Show Profile icon (left) and Logout button (right) -->
+        <a href="/profile" style="display: flex; flex-direction: column; align-items: center; text-decoration: none;">
+          <img src="/assets/images/Profile_icon.png" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%;">
+          <span style="font-size: 0.75rem; color: #333; margin-top: 5px;">Go to your profile</span>
+        </a>
+        <form method="POST" action="/logout" style="display: inline; margin: 0;">
+          <button type="submit" class="login-btn" style="background-color: #dc3545; border: none; cursor: pointer;">Logout</button>
+        </form>
+      {% else %}
+        <!-- Not logged in: Show Login button -->
+        <a href="/login" class="login-btn">Login</a>
+      {% endif %}
     </nav>
   </header>
 
   <!-- Search Section -->
   <section class="search-section">
     <h2>Check your medicine</h2>
-    <form class="search-form">
-      <input type="text" placeholder="Search for another medicine..." name="medicine" />
+    <form class="search-form" method="POST" action="/search">
+      <input type="text" placeholder="Search for another medicine..." name="medicine" required />
       <button type="submit">Search</button>
     </form>
   </section>
@@ -38,27 +47,30 @@
   <!-- Medicine Info Section -->
   <main class="medicine-info">
     <div class="medicine-header">
-      <h1>Aspirin</h1>
-      <a href="#" class="add-profile-btn">+ Add to My Profile</a>
+      <h1>{{ medicine.name }}</h1>
+      {% if user.logged_in %}
+        <form method="POST" action="/api/profile/add-medicine" style="display: inline;">
+          <input type="hidden" name="medicine_name" value="{{ medicine.name.lower() }}">
+          <button type="submit" class="add-profile-btn">+ Add to My Profile</button>
+        </form>
+      {% else %}
+        <a href="login.html" class="add-profile-btn">Login to Save</a>
+      {% endif %}
     </div>
 
     <div class="medicine-description">
-      <p>
-        Aspirin (acetylsalicylic acid) is commonly used to reduce pain, fever, or inflammation. 
-        It can also help prevent heart attacks and strokes by reducing blood clotting. 
-        It should be taken with food or water and never on an empty stomach.
-      </p>
+      <p>{{ medicine.description }}</p>
     </div>
 
     <div class="medicine-extra">
       <div class="advice-box">
         <h3>💡 Advice</h3>
-        <p>Take with food or milk to reduce stomach irritation. Avoid alcohol while using this medicine.</p>
+        <p>{{ medicine.advice }}</p>
       </div>
 
       <div class="warning-box">
         <h3>⚠️ Warning</h3>
-        <p>Do not mix with other blood-thinning medications. Avoid use if you have ulcers or bleeding disorders.</p>
+        <p>{{ medicine.warning }}</p>
       </div>
     </div>
 
@@ -66,14 +78,14 @@
     <div class="pubmed-link">
       <p>
         For more details, see 
-        <a href="https://pubmed.ncbi.nlm.nih.gov/?term=aspirin" target="_blank">
-          official PubMed entries for Aspirin.
+        <a href="{{ medicine.pubmed_link }}" target="_blank">
+          official PubMed entries for {{ medicine.name }}.
         </a>
       </p>
     </div>
   </main>
 
-  <!-- ✅ Footer (bottom bar) -->
+  <!-- Footer -->
   <footer class="footer">
     <p>© 2025 Medicine Explainer & Reminder. All rights reserved.</p>
   </footer>

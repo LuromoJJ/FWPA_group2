@@ -1,25 +1,25 @@
-  <!-- Dominik Szewczyk -->
+<!-- Dominik Szewczyk -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sign Up - MedInfo</title>
-  <link rel="stylesheet" href="css/main.css" />
-  <link rel="stylesheet" href="css/signup.css" />
+  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="/css/signup.css" />
 </head>
 <body>
 
   <!-- Navbar -->
   <header class="navbar">
     <div class="logo">
-      <a href="homepage.html">
-        <img src="assets/images/logo.png" alt="Logo">
+      <a href="/homepage.html">
+        <img src="/assets/images/logo.png" alt="Logo">
         <span>MedInfo</span>
       </a>
     </div>
     <nav class="nav-links">
-      <a href="login.html" class="login-btn">Login</a>
+      <a href="/login" class="login-btn">Login</a>
     </nav>
   </header>
 
@@ -29,7 +29,7 @@
       <h1>Create your account</h1>
       <p class="subtitle">Join MedInfo to manage your medicines easily.</p>
 
-      <form class="signup-form" action="#" method="post">
+      <form class="signup-form" action="/signup" method="POST">
         <div class="form-group">
           <label for="fullname">Full Name</label>
           <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" required />
@@ -42,7 +42,8 @@
 
         <div class="form-group">
           <label for="password">Password</label>
-          <input type="password" id="password" name="password" placeholder="Create a password" required />
+          <input type="password" id="password" name="password" placeholder="Create a password (min 8 characters)" required />
+          <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 5px;">Must be at least 8 characters long</small>
         </div>
 
         <div class="form-group">
@@ -53,7 +54,7 @@
         <button type="submit" class="signup-btn">Sign Up</button>
 
         <p class="login-text">
-          Already have an account? <a href="login.html">Log in</a>
+          Already have an account? <a href="/login">Log in</a>
         </p>
       </form>
     </div>
