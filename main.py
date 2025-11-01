@@ -408,3 +408,59 @@ if __name__ == '__main__':
     print("Medicine: http://localhost:5000/medicine/aspirin")
     print("\nPress CTRL+C to stop\n")
     app.run(debug=True, host='0.0.0.0', port=5000)
+
+
+    #Forgot Password Endpoints (Not Implemented)
+
+    @app.route('/forgot_password', methods=['GET'])
+    def forgot_password_page():
+        #Show forgot password page
+        return render_template('forgot_password.html')
+    
+    @app.route('/forgot_password', methods=['POST'])
+    def forgot_password_submit():
+        # Handle forgot password submission
+         email = request.form.get('email', '').strip().lower()
+        # Logic to send reset link would go here
+         return jsonify({'success': True, 'message': 'Password reset link sent to your email'})    
+  
+  
+    #  Password Reset Endpoints
+
+    @app.route('/set_new_password/<token>', methods=['GET'])
+    def reset_password_page(token):
+        #Show reset password page
+         return render_template('set_new_password.html', token=token)
+    
+    @app.route('/set_newpassword/<token>', methods=['POST'])
+    def reset_password_submit(token):
+        #Handle reset password submission
+         new_password = request.form.get('new_password', '')
+         confirm_password = request.form.get('confirm_password', '')
+        # Logic to reset password would go here
+         if new_password != confirm_password:
+             return jsonify({'success': False, 'error': 'Passwords do not match'}), 400
+         return jsonify({'success': True, 'message': 'Password has been reset successfully'})
+    
+
+
+    # Profile Page Endpoints 
+
+    @app.route('/profile', methods=['GET'])
+    def profile_page():
+        #Show user profile page
+        if 'user_id' not in session:
+            return redirect('/login')
+        user_info = get_current_user()
+        saved_medicines = session.get('saved_medicines', [])
+        medicines_data = [MEDICINE_DATABASE[name] for name in saved_medicines if name in MEDICINE_DATABASE]
+        return render_template('profile.html', user=user_info, medicines=medicines_data)  
+    @app.route('/profile', methods=['POST'])
+    def profile_update():
+        #Update user profile information
+        if 'user_id' not in session:
+            return jsonify({'success': False, 'error': 'Please login first'}), 401
+        #Logic to update profile would go here
+        return jsonify({'success': True, 'message': 'Profile updated successfully'})      
+  
+  
