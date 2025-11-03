@@ -7,6 +7,7 @@ from flask import Flask, render_template, request, jsonify, redirect, session
 import os
 import hashlib
 import re
+import json
 
 # ============================================
 # FLASK APP SETUP
@@ -351,6 +352,121 @@ def add_medicine_to_profile():
     })
 
 # ============================================
+# Password Reset Endpoints
+# ============================================
+@app.route('/forgot_password', methods=['GET'])
+def forgot_password_page():
+    #Show forgot password page
+    return render_template('forgot_password.html')
+    
+@app.route('/forgot_password', methods=['POST'])
+def forgot_password_submit():
+    # Handle forgot password submission
+     email = request.form.get('email', '').strip().lower()
+    # Logic to send reset link would go here
+     return jsonify({'success': True, 'message': 'Password reset link sent to your email'})    
+  
+  #===========================================
+    # Password Reset Endpoints
+  # ============================================
+@app.route('/set_new_password/<token>', methods=['GET'])
+def reset_password_page(token):
+    # Show reset password page
+    return render_template('set_new_password.html', token=token)
+
+@app.route('/set_new_password/<token>', methods=['POST'])
+def reset_password_submit(token):
+    # Handle reset password submission
+    new_password = request.form.get('new_password', '')
+    confirm_password = request.form.get('confirm_password', '')
+    errors = []
+
+    # Basic password validation
+    if not new_password or len(new_password) < 8:
+        errors.append('Password must be at least 8 characters long')
+
+    if new_password != confirm_password:
+        errors.append('Passwords do not match')
+
+    if errors:
+        return jsonify({'success': False, 'errors': errors}), 400
+    
+   #===========================================
+   # sign up form Endpoints
+   # ============================================
+    DATA_FILE = 'form.json'
+
+    @app.route('/form', methods=['GET']) 
+    def form_page():
+          #Show form page
+          return render_template('form.html')
+    @app.route('/form', methods=['POST'])
+    def form_submit():
+          #Handle form submission
+            user_data = {
+                "name": request.form.get("name"),
+                "age": request.form.get("age"),
+                "weight": request.form.get("weight"),
+                "gender": request.form.get("gender"),
+                "medical_conditions": request.form.get("medical_conditions"),
+                "medications": request.form.get("medications"),
+                "height": request.form.get("height"),
+                "smoker": request.form.get("smoker"),
+                "alcohol": request.form.get("alcohol"),
+                "allergies": request.form.get("allergies")
+                }
+            # Save data to JSON file
+            if os.path.exists(DATA_FILE):
+                    with open(DATA_FILE, 'r') as f:
+                        try:
+                            data = json.load(f)
+                        except json.JSONDecodeError:
+                            data = []
+            else:
+                    data = []
+            data.append(user_data)
+            with open(DATA_FILE, 'w') as f:
+                        json.dump(data, f, indent=4)    
+                        
+            print(f"Form data received: {user_data}")  # Debug
+            return jsonify({'success': True, 'message': 'Form submitted successfully'})  
+
+# ============================================
+# Profile Page Endpoints 
+# ============================================
+@app.route('/profile', methods=['GET', 'POST'])
+def profile_page():
+    if 'user_id' not in session:
+        return redirect('/login')
+
+    if request.method == 'GET':
+        # Display profile page
+        user_data = session.get('user_data', {})  # Example: get stored user data
+        saved_medicines = session.get('saved_medicines', [])
+        medicines_data = [
+            MEDICINE_DATABASE[name]
+            for name in saved_medicines
+            if name in MEDICINE_DATABASE
+        ]
+        return render_template('profile.html', user=user_data, medicines=medicines_data)
+
+    elif request.method == 'POST':
+        # Handle profile update
+        updated_data = {
+            "name": request.form.get("name"),
+            "age": request.form.get("age"),
+            "email": request.form.get("email")
+        }
+
+        # Save updated info into session or database
+        session['user_data'] = updated_data
+
+        return jsonify({'success': True, 'message': 'Profile updated successfully'})     
+  
+  
+
+
+# ============================================
 # ERROR HANDLERS
 # ============================================
 
@@ -406,61 +522,12 @@ if __name__ == '__main__':
     print("Signup: http://localhost:5000/signup")
     print("Login: http://localhost:5000/login")
     print("Medicine: http://localhost:5000/medicine/aspirin")
+    print("Profile: http://localhost:5000/profile")
+    print("Form: http://localhost:5000/form")
+    print("forgot Password: http://localhost:5000/forgot_password")
+    print("set New Password: http://localhost:5000/set_new_password/<token>")
     print("\nPress CTRL+C to stop\n")
     app.run(debug=True, host='0.0.0.0', port=5000)
 
 
-    #Forgot Password Endpoints (Not Implemented)
 
-    @app.route('/forgot_password', methods=['GET'])
-    def forgot_password_page():
-        #Show forgot password page
-        return render_template('forgot_password.html')
-    
-    @app.route('/forgot_password', methods=['POST'])
-    def forgot_password_submit():
-        # Handle forgot password submission
-         email = request.form.get('email', '').strip().lower()
-        # Logic to send reset link would go here
-         return jsonify({'success': True, 'message': 'Password reset link sent to your email'})    
-  
-  
-    #  Password Reset Endpoints
-
-    @app.route('/set_new_password/<token>', methods=['GET'])
-    def reset_password_page(token):
-        #Show reset password page
-         return render_template('set_new_password.html', token=token)
-    
-    @app.route('/set_newpassword/<token>', methods=['POST'])
-    def reset_password_submit(token):
-        #Handle reset password submission
-         new_password = request.form.get('new_password', '')
-         confirm_password = request.form.get('confirm_password', '')
-        # Logic to reset password would go here
-         if new_password != confirm_password:
-             return jsonify({'success': False, 'error': 'Passwords do not match'}), 400
-         return jsonify({'success': True, 'message': 'Password has been reset successfully'})
-    
-
-
-    # Profile Page Endpoints 
-
-    @app.route('/profile', methods=['GET'])
-    def profile_page():
-        #Show user profile page
-        if 'user_id' not in session:
-            return redirect('/login')
-        user_info = get_current_user()
-        saved_medicines = session.get('saved_medicines', [])
-        medicines_data = [MEDICINE_DATABASE[name] for name in saved_medicines if name in MEDICINE_DATABASE]
-        return render_template('profile.html', user=user_info, medicines=medicines_data)  
-    @app.route('/profile', methods=['POST'])
-    def profile_update():
-        #Update user profile information
-        if 'user_id' not in session:
-            return jsonify({'success': False, 'error': 'Please login first'}), 401
-        #Logic to update profile would go here
-        return jsonify({'success': True, 'message': 'Profile updated successfully'})      
-  
-  
