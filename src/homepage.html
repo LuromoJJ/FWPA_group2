@@ -24,7 +24,7 @@
           <img src="assets/images/Profile_icon.png" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%;">
           <span style="font-size: 0.75rem; color: #333; margin-top: 5px;">Go to your profile</span>
         </a>
-        <form method="POST" action="logout" style="display: inline; margin: 0;">
+        <form method="POST" action="/logout" style="display: inline; margin: 0;">
           <button type="submit" class="login-btn" style="background-color: #dc3545; border: none; cursor: pointer;">Logout</button>
         </form>
       <!--{% else %}-->
@@ -38,7 +38,7 @@
   <main class="hero">
     <h1>Check your medicine</h1>
 
-    <form class="search-form" method="POST" action="search">
+    <form class="search-form" method="POST" action="/search">
       <input 
         type="text" 
         placeholder="Enter medicine name..." 
