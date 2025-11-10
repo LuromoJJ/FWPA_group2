@@ -352,7 +352,7 @@ def add_medicine_to_profile():
     })
 
 # ============================================
-# Password Reset Endpoints
+# forgot Password Endpoints
 # ============================================
 @app.route('/forgot_password', methods=['GET'])
 def forgot_password_page():
@@ -369,67 +369,125 @@ def forgot_password_submit():
   #===========================================
     # Password Reset Endpoints
   # ============================================
+
+
+RESET_TOKENS = {
+    'token_string': {'email': 'user@example.com', 'expires': '2025-11-5 15:00'}
+}
+USERS_DB = {
+
+}
+def validate_reset_token(token):
+    # Check if the token exists
+    token_data = RESET_TOKENS.get(token)
+    if not token_data:
+        return None
+    
+    # Check if token is expired
+    from datetime import datetime  
+    expires = token_data.get('expires')
+    if expires and datetime.now() > expires:
+        # Token expired
+        del RESET_TOKENS[token]  
+        return None
+
+    # Token is valid, return associated email
+    return token_data.get('email')
+
+
+def invalidate_reset_token(token):
+    # Remove token after use
+    if token in RESET_TOKENS:
+        del RESET_TOKENS[token]
+
+
 @app.route('/set_new_password/<token>', methods=['GET'])
 def reset_password_page(token):
-    # Show reset password page
+    # Optional: validate token exists and is not expired
+    user_email = validate_reset_token(token)  
+    if not user_email:
+        return "Invalid or expired token", 400
+
     return render_template('set_new_password.html', token=token)
+
 
 @app.route('/set_new_password/<token>', methods=['POST'])
 def reset_password_submit(token):
-    # Handle reset password submission
-    new_password = request.form.get('new_password', '')
-    confirm_password = request.form.get('confirm_password', '')
+    # Get form data
+    email = request.form.get('email', '').strip()
+    new_password = request.form.get('new_password', '').strip()
+    confirm_password = request.form.get('confirm_password', '').strip()
+
     errors = []
 
-    # Basic password validation
-    if not new_password or len(new_password) < 8:
-        errors.append('Password must be at least 8 characters long')
+    
+    # --- Token validation ---
+    user_email = validate_reset_token(token)  
+    if not user_email or user_email != email:
+        errors.append("Invalid or expired token")
 
+    # --- Password validation ---
+    if not new_password or len(new_password) < 8:
+        errors.append("Password must be at least 8 characters long")
     if new_password != confirm_password:
-        errors.append('Passwords do not match')
+        errors.append("Passwords do not match")
+    # Optional: Add more checks for strong password if needed
 
     if errors:
         return jsonify({'success': False, 'errors': errors}), 400
+    def update_user_password(email, new_password):
+    # Check if email exists in database
+        if email in USERS_DB:
+        # Assign the new password (in production, hash it!)
+            USERS_DB[email]["password"] = new_password
+            return True
+        return False
     
+    update_user_password(email, new_password)  
+    # Invalidate the token after use
+    invalidate_reset_token(token)
+     
+
+    return jsonify({'success': True, 'message': 'Password updated successfully'})
    #===========================================
    # sign up form Endpoints
    # ============================================
-    DATA_FILE = 'form.json'
+DATA_FILE = 'form.json'
 
-    @app.route('/form', methods=['GET']) 
-    def form_page():
+@app.route('/form', methods=['GET']) 
+def form_page():
           #Show form page
           return render_template('form.html')
-    @app.route('/form', methods=['POST'])
-    def form_submit():
+@app.route('/form', methods=['POST'])
+def form_submit():
           #Handle form submission
-            user_data = {
-                "name": request.form.get("name"),
-                "age": request.form.get("age"),
-                "weight": request.form.get("weight"),
-                "gender": request.form.get("gender"),
-                "medical_conditions": request.form.get("medical_conditions"),
-                "medications": request.form.get("medications"),
-                "height": request.form.get("height"),
-                "smoker": request.form.get("smoker"),
-                "alcohol": request.form.get("alcohol"),
-                "allergies": request.form.get("allergies")
-                }
+        user_data = {
+            "name": request.form.get("name"),
+            "age": request.form.get("age"),
+            "weight": request.form.get("weight"),
+            "gender": request.form.get("gender"),
+            "medical_conditions": request.form.get("medical_conditions"),
+            "medications": request.form.get("medications"),
+            "height": request.form.get("height"),
+            "smoker": request.form.get("smoker"),
+            "alcohol": request.form.get("alcohol"),
+            "allergies": request.form.get("allergies")
+            }
             # Save data to JSON file
-            if os.path.exists(DATA_FILE):
-                    with open(DATA_FILE, 'r') as f:
-                        try:
-                            data = json.load(f)
-                        except json.JSONDecodeError:
-                            data = []
-            else:
-                    data = []
-            data.append(user_data)
-            with open(DATA_FILE, 'w') as f:
-                        json.dump(data, f, indent=4)    
+        if os.path.exists(DATA_FILE):
+                with open(DATA_FILE, 'r') as f:
+                    try:
+                        data = json.load(f)
+                    except json.JSONDecodeError:
+                        data = []
+        else:
+                data = []
+        data.append(user_data)
+        with open(DATA_FILE, 'w') as f:
+                    json.dump(data, f, indent=4)    
                         
-            print(f"Form data received: {user_data}")  # Debug
-            return jsonify({'success': True, 'message': 'Form submitted successfully'})  
+        print(f"Form data received: {user_data}")  # Debug
+        return jsonify({'success': True, 'message': 'Form submitted successfully'})  
 
 # ============================================
 # Profile Page Endpoints 
@@ -440,29 +498,51 @@ def profile_page():
         return redirect('/login')
 
     if request.method == 'GET':
-        # Display profile page
-        user_data = session.get('user_data', {})  # Example: get stored user data
+        # --- Display profile page ---
+        user_data = session.get('user_data', {
+            "name": "",
+            "age": "",
+            "email": "",
+            "weight": "",
+            "height": "",
+            "gender": "",
+            "allergies": "",
+            "medications": "",
+            "smoker": "",
+            "alcohol": ""
+        })
         saved_medicines = session.get('saved_medicines', [])
-        medicines_data = [
-            MEDICINE_DATABASE[name]
-            for name in saved_medicines
-            if name in MEDICINE_DATABASE
-        ]
-        return render_template('profile.html', user=user_data, medicines=medicines_data)
+
+        return render_template(
+            'profile.html',
+            user=user_data,
+            saved_medicines=saved_medicines
+        )
 
     elif request.method == 'POST':
-        # Handle profile update
+        # Handle profile update  
         updated_data = {
-            "name": request.form.get("name"),
-            "age": request.form.get("age"),
-            "email": request.form.get("email")
+            "name": request.form.get("name", "").strip(),
+            "age": request.form.get("age", "").strip(),
+            "email": request.form.get("email", "").strip(),
+            "weight": request.form.get("weight", "").strip(),
+            "height": request.form.get("height", "").strip(),
+            "gender": request.form.get("gender", "").strip(),
+            "allergies": request.form.get("allergies", "").strip(),
+            "medications": request.form.get("medications", "").strip(),
+            "smoker": request.form.get("smoker", "").strip(),
+            "alcohol": request.form.get("alcohol", "").strip()
         }
 
-        # Save updated info into session or database
+        # Validate inputs (numbers, email format)
+        if not updated_data["email"] or "@" not in updated_data["email"]:
+            return jsonify({'success': False, 'message': 'Invalid email'}), 400
+
+        # Save to session or DB
         session['user_data'] = updated_data
 
-        return jsonify({'success': True, 'message': 'Profile updated successfully'})     
-  
+        # JS can use this JSON to dynamically update the page
+        return jsonify({'success': True, 'message': 'Profile updated successfully', 'user': updated_data})
   
 
 
