@@ -6,15 +6,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const warningsList = document.querySelector(".Warnings ul");
 
 
-    let messagesBox = document.getElementById("profileMessage");
-    if (!messageBox) {
-        messageBox = document.createElement("p");
-        messageBox.id = "profileMessage";
-        messageBox.style.color = "blue";
-        messageBox.style.fontweight = "bold";
-        messageBox.style.marginTop ="10px";
-        document.querySelector("-profile-top").prepend(messageBox);
-    }
+
     /* edit profile icon */
     profileIcon.addEventListener("click", function (event){
         messageBox.textContent = "Redirecting to edit profile...";
@@ -44,7 +36,6 @@ function attachEventListeners() {
             a.style.color = "#333";
         });
     });
-
     // Profile icon click
     const profileIcon = document.querySelector(".profile_icon a");
     profileIcon.addEventListener("click", () => {
@@ -52,6 +43,7 @@ function attachEventListeners() {
         // optional: display message or animate
     });
 }
+attachEventListeners();
 /*Display saved Medicines */
     const savedMedicineItems = savedMedicinesList.querySelector("li a");
      savedMedicineItems.forEach(a => {
@@ -100,6 +92,7 @@ function loadMedicineSchedule() {
         });
     }
 }
+loadMedicineSchedule();
 /*  Save User Perferences */
 function saveUserPreferences(preferences) {
     // Example: preferences = { theme: "dark", notifications: true }
