@@ -5,21 +5,24 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sign Up - MedInfo</title>
-  <link rel="stylesheet" href="static/css/main.css" />
-  <link rel="stylesheet" href="static/css/signup.css" />
+  <!-- ✅ FIXED: Use url_for for CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/signup.css') }}" />
+  <script src="{{ url_for('static', filename='js/signup.js') }}"></script>
 </head>
 <body>
 
   <!-- Navbar -->
   <header class="navbar">
     <div class="logo">
-      <a href="/homepage.html">
-        <img src="/assets/images/logo.png" alt="Logo">
+      <!-- ✅ FIXED: Use url_for for homepage -->
+      <a href="{{ url_for('medicine.homepage') }}">
+        <img src="/static/images/logo.png" alt="Logo">
         <span>MedInfo</span>
       </a>
     </div>
     <nav class="nav-links">
-      <a href="/login" class="login-btn">Login</a>
+      <a href="{{ url_for('auth.login_page') }}" class="login-btn">Login</a>
     </nav>
   </header>
 
@@ -29,15 +32,24 @@
       <h1>Create your account</h1>
       <p class="subtitle">Join MedInfo to manage your medicines easily.</p>
 
-      <form class="signup-form" action="/signup" method="POST">
+      <!-- ✅ Show errors if any -->
+      {% if errors %}
+        <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border-radius: 5px; margin-bottom: 15px;">
+          {% for error in errors %}
+            <p style="margin: 5px 0;">{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <form class="signup-form" action="{{ url_for('auth.signup_submit') }}" method="POST">
         <div class="form-group">
           <label for="fullname">Full Name</label>
-          <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" required />
+          <input type="text" id="fullname" name="fullname" placeholder="Enter your full name" value="{{ fullname or '' }}" required />
         </div>
 
         <div class="form-group">
           <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="Enter your email" required />
+          <input type="email" id="email" name="email" placeholder="Enter your email" value="{{ email or '' }}" required />
         </div>
 
         <div class="form-group">
@@ -54,7 +66,7 @@
         <button type="submit" class="signup-btn">Sign Up</button>
 
         <p class="login-text">
-          Already have an account? <a href="/login">Log in</a>
+          Already have an account? <a href="{{ url_for('auth.login_page') }}">Log in</a>
         </p>
       </form>
     </div>
