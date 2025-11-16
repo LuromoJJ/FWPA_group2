@@ -1,82 +1,103 @@
 """
-Medicine Routes - Homepage, Search, Medicine Details
+Medicine Routes - Simple Version
 File: routes/medicine_routes.py
 """
 
 from flask import Blueprint, render_template, request, jsonify, redirect, session
-from models.database import MEDICINE_DATABASE
+from models.database import MEDICINE_DATABASE, save_medicine_to_file
 from utils.helpers import get_current_user
+from utils.ai_service import generate_medicine_info
+import threading
 
-# Create Blueprint
 medicine_bp = Blueprint('medicine', __name__)
 
+# Track which medicines are being generated
+ai_status = {}
+
 # ============================================
-# HOMEPAGE ROUTES
+# HOMEPAGE
 # ============================================
 
 @medicine_bp.route('/')
 @medicine_bp.route('/homepage')
 def homepage():
-    """Show homepage"""
     user_info = get_current_user()
     return render_template('homepage.html', user=user_info)
 
 @medicine_bp.route('/search', methods=['POST'])
 def search_medicine():
-    """Search for medicine"""
     medicine_name = request.form.get('medicine', '').strip()
-    
     if not medicine_name:
-        return jsonify({'error': 'Medicine name is required'}), 400
+        return jsonify({'error': 'Medicine name required'}), 400
     
     medicine_url = medicine_name.lower().replace(' ', '-')
     return redirect(f'/medicine/{medicine_url}')
 
 # ============================================
-# MEDICINE DETAIL ROUTES
+# MEDICINE PAGE - Main Logic
 # ============================================
 
 @medicine_bp.route('/medicine/<name>')
 def medicine_details(name):
-    """Show medicine details"""
     medicine_name = name.lower().replace('-', ' ')
+    
+    # Check if medicine exists
     medicine_data = MEDICINE_DATABASE.get(medicine_name)
     
-    if not medicine_data:
-        return jsonify({'error': f'Medicine "{name}" not found'}), 404
+    if medicine_data:
+        # Medicine found! Show it
+        user_info = get_current_user()
+        return render_template('medicine.html', medicine=medicine_data, user=user_info)
+    
+    # Medicine not found - need AI to generate it
+    status = ai_status.get(medicine_name, 'new')
+    
+    if status == 'new':
+        # First time - start AI generation
+        ai_status[medicine_name] = 'working'
+        thread = threading.Thread(target=generate_ai_info, args=(medicine_name,))
+        thread.start()
+    
+    # Show loading message
+    loading_data = {
+        'name': name.replace('-', ' ').title(),
+        'description': '🤖 AI is generating information... Please wait 1-3 minutes.',
+        'advice': '⏳ Page will refresh automatically every 10 seconds.',
+        'warning': '💡 Make sure LM Studio is running!',
+        'pubmed_link': f'https://pubmed.ncbi.nlm.nih.gov/?term={name.replace("-", "+")}'
+    }
     
     user_info = get_current_user()
-    return render_template('medicine.html', 
-                         medicine=medicine_data,
-                         user=user_info)
+    return render_template('medicine.html', medicine=loading_data, user=user_info)
 
-@medicine_bp.route('/api/medicine/<name>', methods=['GET'])
-def get_medicine_api(name):
-    """Get medicine as JSON"""
-    medicine_name = name.lower().replace('-', ' ')
-    medicine_data = MEDICINE_DATABASE.get(medicine_name)
+# Background function to generate medicine info
+def generate_ai_info(medicine_name):
+    print(f"🤖 Starting AI for: {medicine_name}")
     
-    if not medicine_data:
-        return jsonify({'error': f'Medicine "{name}" not found'}), 404
+    # Call AI
+    medicine_data = generate_medicine_info(medicine_name)
     
-    return jsonify(medicine_data)
+    if medicine_data:
+        print(f"✅ AI done for: {medicine_name}")
+        MEDICINE_DATABASE[medicine_name] = medicine_data
+        save_medicine_to_file(medicine_name, medicine_data)
+        ai_status[medicine_name] = 'done'
+    else:
+        print(f"❌ AI failed for: {medicine_name}")
+        ai_status[medicine_name] = 'failed'
 
 # ============================================
-# SAVE MEDICINE ROUTES
+# ADD TO PROFILE
 # ============================================
 
 @medicine_bp.route('/api/profile/add-medicine', methods=['POST'])
 def add_medicine_to_profile():
-    """Save medicine to profile (requires login)"""
     if 'user_id' not in session:
         return jsonify({'success': False, 'error': 'Please login first'}), 401
     
     medicine_name = request.form.get('medicine_name', '').strip().lower()
     
-    if not medicine_name:
-        return jsonify({'success': False, 'error': 'Medicine name required'}), 400
-    
-    if medicine_name not in MEDICINE_DATABASE:
+    if not medicine_name or medicine_name not in MEDICINE_DATABASE:
         return jsonify({'success': False, 'error': 'Medicine not found'}), 404
     
     if 'saved_medicines' not in session:
@@ -94,19 +115,16 @@ def add_medicine_to_profile():
     })
 
 # ============================================
-# REDIRECT .html FILES
+# REDIRECT OLD .html FILES
 # ============================================
 
 @medicine_bp.route('/<path:filename>.html')
 def block_html_files(filename):
-    """Redirect .html files to proper routes"""
     if filename == 'homepage':
         return redirect('/')
     elif filename == 'login':
         return redirect('/login')
     elif filename == 'signup':
         return redirect('/signup')
-    elif filename == 'medicine':
-        return redirect('/')
     else:
         return redirect('/')

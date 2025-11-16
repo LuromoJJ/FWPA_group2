@@ -51,6 +51,25 @@
   <main class="medicine-info">
     <div class="medicine-header">
       <h1>{{ medicine.name }}</h1>
+      
+      <!-- ✅ Show loading indicator if AI is generating -->
+      {% if 'being generated' in medicine.description %}
+        <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;">
+          <h3 style="margin: 0 0 10px 0; color: #856404;">⏳ AI is generating information...</h3>
+          <p style="margin: 0; color: #856404;">This may take 1-3 minutes. Please wait...</p>
+          <div style="width: 100%; height: 6px; background-color: #e0e0e0; border-radius: 3px; margin-top: 10px; overflow: hidden;">
+            <div style="width: 0%; height: 100%; background-color: #ffc107; animation: loading 2s infinite;"></div>
+          </div>
+          <style>
+            @keyframes loading {
+              0% { width: 0%; }
+              50% { width: 70%; }
+              100% { width: 100%; }
+            }
+          </style>
+        </div>
+      {% endif %}
+      
       {% if user.logged_in %}
         <form method="POST" action="{{ url_for('medicine.add_medicine_to_profile') }}" style="display: inline;">
           <input type="hidden" name="medicine_name" value="{{ medicine.name.lower() }}">
@@ -92,6 +111,19 @@
   <footer class="footer">
     <p>© 2025 Medicine Explainer & Reminder. All rights reserved.</p>
   </footer>
+
+  <script src="{{ url_for('static', filename='js/medicine.js') }}"></script>
+  
+  <!-- Auto-refresh if AI is still generating -->
+  {% if 'being generated' in medicine.description %}
+  <script>
+    console.log('AI is generating... will refresh in 10 seconds');
+    setTimeout(function() {
+      console.log('Refreshing page to check if AI is done...');
+      location.reload();
+    }, 10000); // Refresh every 10 seconds
+  </script>
+  {% endif %}
 
 </body>
 </html>
