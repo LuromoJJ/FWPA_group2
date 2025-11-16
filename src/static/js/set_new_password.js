@@ -23,47 +23,48 @@ document.addEventListener("DOMContentLoaded", function () {
         const newPassword = newPasswordInput.value.trim();
         const confirmPassword = confirmPasswordInput.value.trim();
 
+
 /* Is valid emial*/
-form.addEventListener("submit", function (event) {
-    event.preventDefault(); // stop default submission for validation
+    form.addEventListener("submit", function (event) {
+        event.preventDefault(); // stop default submission for validation
 
-    const email = emailInput.value.trim();
-    const newPassword = newPasswordInput.value.trim();
-    const confirmPassword = confirmPasswordInput.value.trim();
+        const email = emailInput.value.trim();
+        const newPassword = newPasswordInput.value.trim();
+        const confirmPassword = confirmPasswordInput.value.trim();
 
-    // --- Validation checks ---
-    if (!isValidEmail(email)) {
-        showMessage("❌ Please enter a valid email address.", "error");
-        return;
+        // --- Validation checks ---
+        if (!isValidEmail(email)) {
+            showMessage("Please enter a valid email address.", "error");
+            return;
+        }
+
+        if (!newPassword || !confirmPassword) {
+            showMessage("Please fill out all password fields.", "error");
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            showMessage("Passwords do not match.", "error");
+            return;
+        }
+
+        if (newPassword.length < 8) {
+            showMessage("Password must be at least 8 characters long.", "error");
+            return;
+        }
+
+        const strongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/;
+        if (!strongPassword.test(newPassword)) {
+            showMessage("Password must include uppercase, lowercase, number, and special character.", "error");
+            return;
+        }
+    /* display message */
+    function isValidEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
-    if (!newPassword || !confirmPassword) {
-        showMessage("⚠️ Please fill out all password fields.", "error");
-        return;
+    function showMessage(text, type) {
+        messageBox.textContent = text;
+        messageBox.style.color = type === "error" ? "red" : "green";
     }
-
-    if (newPassword !== confirmPassword) {
-        showMessage("❌ Passwords do not match.", "error");
-        return;
-    }
-
-    if (newPassword.length < 8) {
-        showMessage("⚠️ Password must be at least 8 characters long.", "error");
-        return;
-    }
-
-    const strongPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/;
-    if (!strongPassword.test(newPassword)) {
-        showMessage("⚠️ Password must include uppercase, lowercase, number, and special character.", "error");
-        return;
-    }
-/* display message */
-function isValidEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-function showMessage(text, type) {
-    messageBox.textContent = text;
-    messageBox.style.color = type === "error" ? "red" : "green";
-}
-});
+    })})});
