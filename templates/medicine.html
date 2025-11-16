@@ -5,32 +5,35 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Medicine Info - {{ medicine.name }}</title>
-  <link rel="stylesheet" href="static/css/main.css" />
-  <link rel="stylesheet" href="static/css/medicine.css" />
+  <!-- ✅ FIXED: Use url_for for CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/medicine.css') }}" />
+  <script src="{{ url_for('static', filename='js/medicine.js') }}"></script>
 </head>
 <body>
 
 <!-- Navbar -->
   <header class="navbar">
     <div class="logo">
-      <a href="/homepage.html">
-        <img src="/assets/images/logo.png" alt="Logo">
+      <!-- ✅ FIXED: Use url_for for homepage -->
+      <a href="{{ url_for('medicine.homepage') }}">
+        <img src="/static/images/logo.png" alt="Logo">
         <span>MedInfo</span>
       </a>
     </div>
     <nav class="nav-links" style="display: flex; align-items: center; gap: 15px;">
       {% if user.logged_in %}
         <!-- Logged in: Show Profile icon (left) and Logout button (right) -->
-        <a href="/profile" style="display: flex; flex-direction: column; align-items: center; text-decoration: none;">
-          <img src="/assets/images/Profile_icon.png" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%;">
+        <a href="{{ url_for('profile.profile_page') }}" style="display: flex; flex-direction: column; align-items: center; text-decoration: none;">
+          <img src="/static/images/Profile_icon.png" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%;">
           <span style="font-size: 0.75rem; color: #333; margin-top: 5px;">Go to your profile</span>
         </a>
-        <form method="POST" action="/logout" style="display: inline; margin: 0;">
+        <form method="POST" action="{{ url_for('auth.logout') }}" style="display: inline; margin: 0;">
           <button type="submit" class="login-btn" style="background-color: #dc3545; border: none; cursor: pointer;">Logout</button>
         </form>
       {% else %}
         <!-- Not logged in: Show Login button -->
-        <a href="/login" class="login-btn">Login</a>
+        <a href="{{ url_for('auth.login_page') }}" class="login-btn">Login</a>
       {% endif %}
     </nav>
   </header>
@@ -38,7 +41,7 @@
   <!-- Search Section -->
   <section class="search-section">
     <h2>Check your medicine</h2>
-    <form class="search-form" method="POST" action="/search">
+    <form class="search-form" method="POST" action="{{ url_for('medicine.search_medicine') }}">
       <input type="text" placeholder="Search for another medicine..." name="medicine" required />
       <button type="submit">Search</button>
     </form>
@@ -49,12 +52,12 @@
     <div class="medicine-header">
       <h1>{{ medicine.name }}</h1>
       {% if user.logged_in %}
-        <form method="POST" action="/api/profile/add-medicine" style="display: inline;">
+        <form method="POST" action="{{ url_for('medicine.add_medicine_to_profile') }}" style="display: inline;">
           <input type="hidden" name="medicine_name" value="{{ medicine.name.lower() }}">
           <button type="submit" class="add-profile-btn">+ Add to My Profile</button>
         </form>
       {% else %}
-        <a href="login.html" class="add-profile-btn">Login to Save</a>
+        <a href="{{ url_for('auth.login_page') }}" class="add-profile-btn">Login to Save</a>
       {% endif %}
     </div>
 
