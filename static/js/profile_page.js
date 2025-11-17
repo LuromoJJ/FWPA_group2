@@ -45,7 +45,7 @@ function attachEventListeners() {
 }
 attachEventListeners();
 /*Display saved Medicines */
-    const savedMedicineItems = savedMedicinesList.querySelector("li a");
+    const savedMedicineItems = savedMedicineList.querySelector("li a");
      savedMedicineItems.forEach(a => {
         a.addEventListener("mouseover", () =>{
             a.style.color="#007BFF";
@@ -112,4 +112,7 @@ function loadUserPreferences() {
     console.log("Loaded preferences:", prefs);
    
 }
+ loadUserPreferences();
+
+ 
 })
