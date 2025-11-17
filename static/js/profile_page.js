@@ -95,22 +95,21 @@ function loadMedicineSchedule() {
 loadMedicineSchedule();
 /*  Save User Perferences */
 function saveUserPreferences(preferences) {
-    // Example: preferences = { theme: "dark", notifications: true }
     localStorage.setItem("userPreferences", JSON.stringify(preferences));
     console.log("User preferences saved!");
 }
 
-// Example usage
+
 const userPrefs = {
     theme: "light",
     notifications: true
 };
 saveUserPreferences(userPrefs);
 
-// Optional: load preferences on page load
+
 function loadUserPreferences() {
     const prefs = JSON.parse(localStorage.getItem("userPreferences")) || {};
     console.log("Loaded preferences:", prefs);
-    // Apply preferences to page (theme, notifications, etc.)
+   
 }
 })
