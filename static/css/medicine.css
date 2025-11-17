@@ -75,6 +75,8 @@
   border-radius: 8px;
   font-weight: 600;
   transition: 0.3s;
+  border: none;
+  cursor: pointer;
 }
 
 .add-profile-btn:hover {
@@ -86,9 +88,10 @@
   margin-bottom: 2rem;
   font-size: 1.1rem;
   line-height: 1.7;
+  color: #333;
 }
 
-/* Advice & warning boxes */
+/* Advice & warning boxes - UPDATED FOR BULLET POINTS */
 .medicine-extra {
   display: flex;
   gap: 1.5rem;
@@ -98,33 +101,57 @@
 
 .advice-box, .warning-box {
   flex: 1;
-  padding: 1rem;
-  border-radius: 10px;
-  font-size: 0.9rem;
-  line-height: 1.4;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  min-width: 300px;
+  padding: 1.5rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  line-height: 1.8;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .advice-box {
-  border: 2px solid var(--green-dark);
+  border-left: 4px solid var(--green-dark);
   background-color: #f9fff6;
 }
 
 .warning-box {
-  border: 2px solid #d9534f;
+  border-left: 4px solid #d9534f;
   background-color: #fff6f6;
 }
 
 .advice-box h3, .warning-box h3 {
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #333;
+}
+
+/* Make bullet points display nicely */
+.advice-box p, .warning-box p {
+  white-space: pre-line; /* Preserve line breaks from AI */
+  margin: 0;
+  color: #444;
+}
+
+/* Style for bullet point lines */
+.advice-box p,
+.warning-box p {
+  line-height: 2;
 }
 
 /* PubMed link section */
 .pubmed-link {
   text-align: center;
-  margin-top: 2rem;
-  font-size: 1.1rem;
+  margin-top: 2.5rem;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.pubmed-link p {
+  margin: 0;
+  color: #666;
 }
 
 .pubmed-link a {
@@ -149,23 +176,46 @@
 .profile-icon img:hover {
   opacity: 0.8;
 }
+
 /* Make the page take full height and footer at bottom */
 body {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* full viewport height */
+  min-height: 100vh;
   margin: 0;
 }
 
 main {
-  flex: 1; /* take remaining space */
+  flex: 1;
 }
 
-/* Footer styling (optional) */
+/* Footer styling */
 .footer {
   background-color: var(--green-dark);
   color: white;
   text-align: center;
   padding: 1rem 0;
   font-size: 0.9rem;
+  margin-top: auto;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .medicine-extra {
+    flex-direction: column;
+  }
+  
+  .advice-box, .warning-box {
+    min-width: 100%;
+  }
+  
+  .medicine-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .medicine-header h1 {
+    font-size: 1.8rem;
+  }
 }

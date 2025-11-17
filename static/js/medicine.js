@@ -1,38 +1,107 @@
 /**
- * Medicine Page JavaScript
+ * Medicine Page JavaScript - Simple Version
  * File: static/js/medicine.js
- * Author: Dominik Szewczyk
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Medicine page loaded');
-
-    const addProfileBtn = document.querySelector('.add-profile-btn');
-
-    // ✅ Add to Profile with AJAX (no page reload)
-    if (addProfileBtn && addProfileBtn.tagName === 'BUTTON') {
-        setupAddToProfile(addProfileBtn);
+    
+    // Check if AI is working
+    const description = document.querySelector('.medicine-description p');
+    if (description && description.textContent.includes('🤖')) {
+        showLoadingScreen();
+        autoRefreshPage();
     }
-
-    // ✅ Smooth Animations (sections fade in one by one)
-    animateMedicineInfo();
+    
+    // Setup "Add to Profile" button
+    setupAddToProfile();
+    
+    // Animate page sections
+    animateSections();
 });
 
-/**
- * ✅ Add to Profile with AJAX - saves without reloading page
- */
-function setupAddToProfile(addProfileBtn) {
-    const form = addProfileBtn.closest('form');
+// ============================================
+// SHOW LOADING SCREEN
+// ============================================
+function showLoadingScreen() {
+    const overlay = document.createElement('div');
+    overlay.innerHTML = `
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                    background: rgba(0,0,0,0.8); z-index: 9999; 
+                    display: flex; justify-content: center; align-items: center;">
+            <div style="background: white; padding: 40px; border-radius: 16px; text-align: center; max-width: 500px;">
+                <div class="spinner"></div>
+                <h3 style="margin: 20px 0;">🤖 AI is Researching...</h3>
+                <p style="color: #666;">Analyzing medical information</p>
+                <div style="width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; margin: 20px 0; overflow: hidden;">
+                    <div class="progress-bar"></div>
+                </div>
+                <p style="color: #ffc107; font-weight: bold;">Takes 1-3 minutes</p>
+                <p id="countdown" style="color: #17a2b8; font-size: 0.9em;">Refreshing in 10 seconds...</p>
+            </div>
+        </div>
+    `;
+    
+    // Add CSS
+    const style = document.createElement('style');
+    style.textContent = `
+        .spinner {
+            width: 50px; height: 50px; margin: 0 auto;
+            border: 5px solid #f3f3f3; border-top: 5px solid #90A955;
+            border-radius: 50%; animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .progress-bar {
+            width: 0%; height: 100%; background: linear-gradient(90deg, #90A955, #ADC178);
+            animation: progress 3s ease-in-out infinite;
+        }
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 95%; }
+        }
+    `;
+    document.head.appendChild(style);
+    document.body.appendChild(overlay);
+}
+
+// ============================================
+// AUTO REFRESH PAGE
+// ============================================
+function autoRefreshPage() {
+    let seconds = 10;
+    
+    const countdown = setInterval(() => {
+        seconds--;
+        const countdownEl = document.getElementById('countdown');
+        if (countdownEl) {
+            countdownEl.textContent = `Refreshing in ${seconds} seconds...`;
+        }
+    }, 1000);
+    
+    setTimeout(() => {
+        clearInterval(countdown);
+        location.reload();
+    }, 10000);
+}
+
+// ============================================
+// ADD TO PROFILE BUTTON
+// ============================================
+function setupAddToProfile() {
+    const button = document.querySelector('.add-profile-btn');
+    if (!button || button.tagName !== 'BUTTON') return;
+    
+    const form = button.closest('form');
     
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
         
-        const formData = new FormData(this);
+        button.disabled = true;
+        button.textContent = 'Adding...';
         
-        // Show loading state
-        addProfileBtn.disabled = true;
-        const originalText = addProfileBtn.textContent;
-        addProfileBtn.textContent = 'Adding...';
+        const formData = new FormData(this);
         
         try {
             const response = await fetch('/api/profile/add-medicine', {
@@ -42,128 +111,68 @@ function setupAddToProfile(addProfileBtn) {
             
             const data = await response.json();
             
-            if (response.ok && data.success) {
-                // ✅ Success
-                addProfileBtn.textContent = '✓ Added to Profile';
-                addProfileBtn.style.backgroundColor = '#28a745';
-                
-                // Show success notification
-                showNotification('Medicine added to your profile!', 'success');
-                
-                setTimeout(() => {
-                    addProfileBtn.disabled = false;
-                }, 2000);
+            if (data.success) {
+                button.textContent = '✓ Added!';
+                button.style.backgroundColor = '#28a745';
+                showNotification('Medicine added to profile!', 'success');
             } else {
-                // ✅ Error
-                addProfileBtn.textContent = originalText;
-                addProfileBtn.disabled = false;
-                
-                // Show error notification
-                showNotification(data.error || data.message || 'Failed to add medicine', 'error');
+                button.textContent = '+ Add to My Profile';
+                button.disabled = false;
+                showNotification(data.error || 'Failed', 'error');
             }
         } catch (error) {
-            console.error('Error:', error);
-            addProfileBtn.textContent = originalText;
-            addProfileBtn.disabled = false;
-            
-            // Show error notification
-            showNotification('Network error. Please try again.', 'error');
+            button.textContent = '+ Add to My Profile';
+            button.disabled = false;
+            showNotification('Network error', 'error');
         }
     });
 }
 
-/**
- * ✅ Success/Error Notifications - popup in corner
- */
-function showNotification(message, type = 'info') {
-    // Remove existing notification
-    const existingNotif = document.querySelector('.notification');
-    if (existingNotif) {
-        existingNotif.remove();
-    }
-
-    // Create notification
-    const notification = document.createElement('div');
-    notification.className = 'notification';
-    notification.textContent = message;
-    
-    // Colors based on type
+// ============================================
+// SHOW NOTIFICATION
+// ============================================
+function showNotification(message, type) {
     const colors = {
-        success: '#28a745',  // 🟢 Green
-        error: '#dc3545',    // 🔴 Red
-        info: '#17a2b8'      // 🔵 Blue
+        success: '#28a745',
+        error: '#dc3545',
+        info: '#17a2b8'
     };
     
-    notification.style.position = 'fixed';
-    notification.style.top = '20px';
-    notification.style.right = '20px';
-    notification.style.backgroundColor = colors[type] || colors.info;
-    notification.style.color = 'white';
-    notification.style.padding = '15px 20px';
-    notification.style.borderRadius = '8px';
-    notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-    notification.style.zIndex = '1000';
-    notification.style.fontSize = '0.95rem';
-    notification.style.fontWeight = '500';
-    notification.style.animation = 'slideIn 0.3s ease';
-    
-    document.body.appendChild(notification);
-    
-    // Add slide in/out animations
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        @keyframes slideOut {
-            from {
-                transform: translateX(0);
-                opacity: 1;
-            }
-            to {
-                transform: translateX(400px);
-                opacity: 0;
-            }
-        }
+    const notif = document.createElement('div');
+    notif.textContent = message;
+    notif.style.cssText = `
+        position: fixed; top: 20px; right: 20px; z-index: 1000;
+        background: ${colors[type]}; color: white; padding: 15px 20px;
+        border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     `;
-    document.head.appendChild(style);
     
-    // Remove after 3 seconds
-    setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
+    document.body.appendChild(notif);
+    
+    setTimeout(() => notif.remove(), 3000);
 }
 
-/**
- * ✅ Smooth Animations - sections fade in one by one
- */
-function animateMedicineInfo() {
-    const medicineHeader = document.querySelector('.medicine-header');
-    const medicineDescription = document.querySelector('.medicine-description');
-    const adviceBox = document.querySelector('.advice-box');
-    const warningBox = document.querySelector('.warning-box');
-    const pubmedLink = document.querySelector('.pubmed-link');
+// ============================================
+// ANIMATE SECTIONS
+// ============================================
+function animateSections() {
+    const sections = [
+        document.querySelector('.medicine-header'),
+        document.querySelector('.medicine-description'),
+        document.querySelector('.advice-box'),
+        document.querySelector('.warning-box'),
+        document.querySelector('.pubmed-link')
+    ];
     
-    const elements = [medicineHeader, medicineDescription, adviceBox, warningBox, pubmedLink];
-    
-    elements.forEach((element, index) => {
-        if (element) {
-            element.style.opacity = '0';
-            element.style.transform = 'translateY(20px)';
-            element.style.transition = 'all 0.5s ease';
+    sections.forEach((section, i) => {
+        if (section) {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'all 0.5s ease';
             
             setTimeout(() => {
-                element.style.opacity = '1';
-                element.style.transform = 'translateY(0)';
-            }, 100 + (index * 100)); // Each element appears 100ms after previous
+                section.style.opacity = '1';
+                section.style.transform = 'translateY(0)';
+            }, 100 + (i * 100));
         }
     });
 }
