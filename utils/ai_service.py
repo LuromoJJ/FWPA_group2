@@ -8,7 +8,7 @@ import requests
 import json
 
 # LM Studio Configuration
-LM_STUDIO_URL = "http://localhost:1234/v1/chat/completions"  # Default LM Studio endpoint
+LM_STUDIO_URL = "http://localhost:1234/v1/chat/completions"
 
 def generate_medicine_info(medicine_name):
     """
@@ -35,22 +35,24 @@ Respond ONLY with this JSON format (no extra text):
 {{
     "name": "{medicine_name.title()}",
     "description": "Write about 50 words (3-4 sentences) explaining: What is this medicine? What conditions does it treat? How does it work in the body? Keep language simple and friendly.",
-    "advice": "• First piece of advice here\n• Second piece of advice here\n• Third piece of advice here\n• Fourth piece of advice here",
-    "warning": "• First warning here\n• Second warning here\n• Third warning here\n• Fourth warning here",
+    "advice": "• First piece of advice here\\n• Second piece of advice here\\n• Third piece of advice here\\n• Fourth piece of advice here",
+    "warning": "• First warning here\\n• Second warning here\\n• Third warning here\\n• Fourth warning here",
     "pubmed_link": "https://pubmed.ncbi.nlm.nih.gov/?term={medicine_name.replace(' ', '+')}"
 }}
 
 EXAMPLE of correct format:
-"advice": "• Take with a full glass of water\n• Take at the same time each day\n• Don't skip doses\n• Finish the full course"
+"advice": "• Take with a full glass of water\\n• Take at the same time each day\\n• Don't skip doses\\n• Finish the full course"
 
 Each bullet point should be one clear, short sentence. Focus on the most important practical information."""
 
     try:
+        print(f"🤖 Calling LM Studio for: {medicine_name}")
+        
         # Call LM Studio API
         response = requests.post(
             LM_STUDIO_URL,
             json={
-                "model": "local-model",  # LM Studio uses "local-model"
+                "model": "local-model",
                 "messages": [
                     {
                         "role": "system",
@@ -64,38 +66,40 @@ Each bullet point should be one clear, short sentence. Focus on the most importa
                 "temperature": 0.7,
                 "max_tokens": 1000,
             },
-            timeout=180  # 3 minutes timeout for large models
+            timeout=180
         )
         
         if response.status_code == 200:
             data = response.json()
-            
-            # Extract AI response
             ai_response = data['choices'][0]['message']['content']
             
-            print(f"AI Response: {ai_response}")
+            print(f"📥 AI Response received (length: {len(ai_response)} chars)")
             
             # Parse JSON from response
             medicine_info = parse_medicine_json(ai_response)
             
             if medicine_info:
+                print(f"✅ Successfully parsed medicine info")
+                print(f"📦 Type: {type(medicine_info)}")
+                print(f"📝 Keys: {list(medicine_info.keys())}")
+                print(f"🏥 Name: {medicine_info.get('name')}")
                 return medicine_info
             else:
-                print("Failed to parse AI response as JSON")
+                print("❌ Failed to parse AI response as JSON")
                 return None
         else:
-            print(f"LM Studio API error: {response.status_code}")
+            print(f"❌ LM Studio API error: {response.status_code}")
             print(f"Response: {response.text}")
             return None
             
     except requests.exceptions.ConnectionError:
-        print("Error: Cannot connect to LM Studio. Make sure LM Studio is running on http://localhost:1234")
+        print("❌ Error: Cannot connect to LM Studio. Make sure it's running on http://localhost:1234")
         return None
     except requests.exceptions.Timeout:
-        print("Error: LM Studio request timed out")
+        print("❌ Error: LM Studio request timed out")
         return None
     except Exception as e:
-        print(f"Error calling LM Studio: {str(e)}")
+        print(f"❌ Error calling LM Studio: {str(e)}")
         return None
 
 
@@ -124,16 +128,20 @@ def parse_medicine_json(ai_response):
         
         cleaned = cleaned.strip()
         
+        print(f"🧹 Cleaned response (first 200 chars): {cleaned[:200]}...")
+        
         # Parse JSON
         medicine_info = json.loads(cleaned)
         
         # Validate required fields
         required_fields = ['name', 'description', 'advice', 'warning', 'pubmed_link']
-        if not all(field in medicine_info for field in required_fields):
-            print(f"Missing required fields in AI response")
+        missing_fields = [f for f in required_fields if f not in medicine_info]
+        
+        if missing_fields:
+            print(f"❌ Missing required fields: {missing_fields}")
             return None
         
-        # FIX: Convert arrays to text with line breaks
+        # Convert arrays to text with line breaks if needed
         if isinstance(medicine_info['advice'], list):
             medicine_info['advice'] = '\n'.join(medicine_info['advice'])
         
@@ -144,11 +152,15 @@ def parse_medicine_json(ai_response):
         medicine_info['advice'] = medicine_info['advice'].replace("['", "").replace("']", "").replace("', '", "\n")
         medicine_info['warning'] = medicine_info['warning'].replace("['", "").replace("']", "").replace("', '", "\n")
         
+        print(f"✅ Parsed successfully! Type: {type(medicine_info)}")
         return medicine_info
             
     except json.JSONDecodeError as e:
-        print(f"JSON parse error: {e}")
-        print(f"AI response was: {ai_response}")
+        print(f"❌ JSON parse error: {e}")
+        print(f"Raw AI response: {ai_response[:500]}...")
+        return None
+    except Exception as e:
+        print(f"❌ Unexpected error in parse_medicine_json: {e}")
         return None
 
 
@@ -178,17 +190,18 @@ def test_lm_studio_connection():
 
 # For testing purposes
 if __name__ == "__main__":
-    print("Testing LM Studio connection...")
+    print("🧪 Testing LM Studio connection...")
     if test_lm_studio_connection():
         print("✓ LM Studio is running!")
         
-        print("\nTesting medicine info generation...")
+        print("\n🧪 Testing medicine info generation...")
         result = generate_medicine_info("aspirin")
         
         if result:
-            print("\n✓ Successfully generated medicine info:")
+            print("\n✅ Successfully generated medicine info:")
+            print(f"Type: {type(result)}")
             print(json.dumps(result, indent=2))
         else:
-            print("\n✗ Failed to generate medicine info")
+            print("\n❌ Failed to generate medicine info")
     else:
-        print("✗ Cannot connect to LM Studio. Make sure it's running on http://localhost:1234")
+        print("❌ Cannot connect to LM Studio. Make sure it's running on http://localhost:1234")

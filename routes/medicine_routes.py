@@ -1,15 +1,18 @@
 """
-Medicine Routes - Simple Version
+Medicine Routes - Updated to use MongoDB
 File: routes/medicine_routes.py
 """
 
 from flask import Blueprint, render_template, request, jsonify, redirect, session
-from models.database import MEDICINE_DATABASE, save_medicine_to_file
+from models.medicine_model import MedicineModel  # ← Import MongoDB model
 from utils.helpers import get_current_user
 from utils.ai_service import generate_medicine_info
 import threading
 
 medicine_bp = Blueprint('medicine', __name__)
+
+# Initialize MongoDB model
+medicine_model = MedicineModel()
 
 # Track which medicines are being generated
 ai_status = {}
@@ -41,8 +44,8 @@ def search_medicine():
 def medicine_details(name):
     medicine_name = name.lower().replace('-', ' ')
     
-    # Check if medicine exists
-    medicine_data = MEDICINE_DATABASE.get(medicine_name)
+    # Check if medicine exists in MongoDB
+    medicine_data = medicine_model.get_medicine_by_name(medicine_name)
     
     if medicine_data:
         # Medicine found! Show it
@@ -56,6 +59,7 @@ def medicine_details(name):
         # First time - start AI generation
         ai_status[medicine_name] = 'working'
         thread = threading.Thread(target=generate_ai_info, args=(medicine_name,))
+        thread.daemon = True
         thread.start()
     
     # Show loading message
@@ -79,8 +83,8 @@ def generate_ai_info(medicine_name):
     
     if medicine_data:
         print(f"✅ AI done for: {medicine_name}")
-        MEDICINE_DATABASE[medicine_name] = medicine_data
-        save_medicine_to_file(medicine_name, medicine_data)
+        # Save to MongoDB instead of JSON
+        medicine_model.create_medicine(medicine_data)
         ai_status[medicine_name] = 'done'
     else:
         print(f"❌ AI failed for: {medicine_name}")
@@ -97,7 +101,10 @@ def add_medicine_to_profile():
     
     medicine_name = request.form.get('medicine_name', '').strip().lower()
     
-    if not medicine_name or medicine_name not in MEDICINE_DATABASE:
+    # Check if medicine exists in MongoDB
+    medicine_data = medicine_model.get_medicine_by_name(medicine_name)
+    
+    if not medicine_data:
         return jsonify({'success': False, 'error': 'Medicine not found'}), 404
     
     if 'saved_medicines' not in session:
@@ -111,7 +118,7 @@ def add_medicine_to_profile():
     
     return jsonify({
         'success': True,
-        'message': f'{MEDICINE_DATABASE[medicine_name]["name"]} added to profile'
+        'message': f'{medicine_data["name"]} added to profile'
     })
 
 # ============================================
@@ -128,3 +135,12 @@ def block_html_files(filename):
         return redirect('/signup')
     else:
         return redirect('/')
+
+# ============================================
+# CLOSE CONNECTION WHEN APP STOPS
+# ============================================
+
+@medicine_bp.teardown_app_request
+def close_db_connection(exception=None):
+    """Close MongoDB connection when request ends"""
+    pass  # Connection pooling handles this automatically
