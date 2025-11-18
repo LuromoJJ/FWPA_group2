@@ -12,7 +12,7 @@ profile_bp = Blueprint('profile', __name__)
 # PROFILE ROUTES
 # ============================================
 
-@profile_bp.route('/profile', methods=['GET', 'POST'])
+@profile_bp.route('/profile_page', methods=['GET', 'POST'])
 def profile_page():
     """Show and update user profile"""
     if 'user_id' not in session:
