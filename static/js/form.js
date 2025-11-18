@@ -1,6 +1,5 @@
 /* Initialize sign up form*/
 document.getElementById("info Form").addEventListener("submit", handleFormsubmit);{
-    const userResponseList = document.querySelector(".form_container");
     const getFormData = document.querySelector(".User_information ul");
 
 
@@ -34,7 +33,7 @@ function showError(message){
 /* Handle Form submission*/
 
 async function handleFormsubmit(event) {
-    /*trying to prevent page form relaoding instantly */
+    /*trying to prevent page form reloading instantly */
     event.preventDefault();
     const deta = getFormData();
     const error = validateData();
