@@ -5,21 +5,15 @@ File: routes/profile_routes.py
 
 from flask import Blueprint, render_template, request, jsonify, redirect, session
 
-# Create Blueprint
 profile_bp = Blueprint('profile', __name__)
 
-# ============================================
-# PROFILE ROUTES
-# ============================================
-
-@profile_bp.route('/profile', methods=['GET', 'POST'])
+@profile_bp.route('/profile_page', methods=['GET', 'POST'])
 def profile_page():
     """Show and update user profile"""
     if 'user_id' not in session:
         return redirect('/login')
 
     if request.method == 'GET':
-        # Display profile page
         user_data = session.get('user_data', {
             "name": "",
             "age": "",
@@ -34,14 +28,14 @@ def profile_page():
         })
         saved_medicines = session.get('saved_medicines', [])
 
+        # Use the correct template name
         return render_template(
-            'profile.html',  # template should exist in templates/
+            'profile_page.html',
             user=user_data,
             saved_medicines=saved_medicines
         )
 
     elif request.method == 'POST':
-        # Handle profile update
         updated_data = {
             "name": request.form.get("name", "").strip(),
             "age": request.form.get("age", "").strip(),
@@ -55,11 +49,9 @@ def profile_page():
             "alcohol": request.form.get("alcohol", "").strip()
         }
 
-        # Validate email
         if not updated_data["email"] or "@" not in updated_data["email"]:
             return jsonify({'success': False, 'message': 'Invalid email'}), 400
 
-        # Save to session
         session['user_data'] = updated_data
 
         return jsonify({

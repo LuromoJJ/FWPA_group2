@@ -71,7 +71,7 @@ if __name__ == '__main__':
     print("Signup: http://localhost:5000/signup")
     print("Login: http://localhost:5000/login")
     print("Medicine: http://localhost:5000/medicine/aspirin")
-    print("Profile: http://localhost:5000/profile")
+    print("Profile: http://localhost:5000/profile_page")
     print("Form: http://localhost:5000/form")
     print("Forgot Password: http://localhost:5000/forgot_password")
     print("Set new Password: http://localhost:5000/set_new_password/<token>")
