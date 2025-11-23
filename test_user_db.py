@@ -15,7 +15,7 @@ test_user = {
     "user_id": 1,
     "fullname": "Test User",
     "email": "test@example.com",
-    "password": hashlib.sha256("password123".encode()).hexdigest()
+    "password": hashlib.sha256("1234".encode()).hexdigest()
 }
 
 # INSERT TEST USER
