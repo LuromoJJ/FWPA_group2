@@ -23,7 +23,7 @@ db = client[database_name]
 
 # Collections
 users_collection = db['users']
-medicines_collection = db['Medicine']  # Your collection name
+medicines_collection = db['Medicine'] 
 reset_tokens_collection = db['reset_tokens']
 
 print(f"✓ Connected to MongoDB at {mongodb_uri}, DB: {database_name}")

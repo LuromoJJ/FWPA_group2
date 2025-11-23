@@ -6,6 +6,7 @@ Run this to test if MongoDB is working
 from models.medicine_model import MedicineModel
 import json
 
+
 print("=" * 50)
 print("🧪 TESTING MONGODB CONNECTION")
 print("=" * 50)
