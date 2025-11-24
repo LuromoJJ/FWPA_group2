@@ -5,7 +5,7 @@ File: routes/auth_routes.py
 
 from flask import Blueprint, render_template, request, jsonify, redirect, session
 import hashlib
-from models.database import USERS_DATABASE
+from models.user_model import UserModel
 from utils.helpers import validate_reset_token, invalidate_reset_token, update_user_password
 
 # Create Blueprint
@@ -19,7 +19,7 @@ auth_bp = Blueprint('auth', __name__)
 def signup_page():
     """Show signup page"""
     if 'user_id' in session:
-        return redirect('/profile')
+        return redirect('/profile_page')
     
     return render_template('signup.html')
 
@@ -49,49 +49,50 @@ def signup_submit():
     if email and '@' not in email:
         errors.append('Invalid email format')
     
-    if email and email in USERS_DATABASE:
-        errors.append('Email already registered')
-    
     if password and len(password) < 8:
         errors.append('Password must be at least 8 characters')
     
     if password and confirm_password and password != confirm_password:
         errors.append('Passwords do not match')
     
+    user_model = UserModel()
+    existing_user = user_model.get_user_by_email(email)
+    if existing_user:
+        errors.append('Email already registered')
+
     if errors:
         return render_template('signup.html', 
                              errors=errors,
                              fullname=fullname, 
                              email=email)
-    
+    #hash the password
+    hashed_pw = hashlib.sha256(password.encode()).hexdigest()
+
     # Create user
-    user_id = len(USERS_DATABASE) + 1
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    
-    USERS_DATABASE[email] = {
-        'user_id': user_id,
+    user_doc = {
         'fullname': fullname,
         'email': email,
-        'password': hashed_password
+        'password': hashed_pw
     }
-    
+    new_user_id = user_model.create_user(user_doc)
+    user_model.close()
+
     print(f"New user created: {email}")
     
     session['signup_success'] = True
     return redirect('/login')
-
-@auth_bp.route('/api/auth/check-email', methods=['GET', 'POST'])
+# email check
+@auth_bp.route('/api/auth/check-email', methods=['GET'])
 def check_email():
     """Check if email exists"""
-    if request.method == 'GET':
-        email = request.args.get('email', '').strip().lower()
-    else:
-        email = request.form.get('email', '').strip().lower()
+    email =  request.args.get('email', '').strip().lower()
     
     if not email:
         return jsonify({'available': False, 'message': 'Email required'}), 400
-    
-    if email in USERS_DATABASE:
+    user_model = UserModel()
+    exists = user_model.get_user_by_email(email) is not None
+    user_model.close()
+    if exists:
         return jsonify({'available': False, 'message': 'Email already in use'})
     
     return jsonify({'available': True, 'message': 'Email is available'})
@@ -100,70 +101,41 @@ def check_email():
 # LOGIN ROUTES
 # ============================================
 
-@auth_bp.route('/login', methods=['GET'])
-def login_page():
-    """Show login page"""
-    if 'user_id' in session:
-        return redirect('/')
-    
-    signup_success = session.pop('signup_success', False)
-    return render_template('login.html', signup_success=signup_success)
-
 @auth_bp.route('/login', methods=['POST'])
 def login_submit():
-    """Login user"""
+    """Login user using MongoDB"""
     email = request.form.get('email', '').strip().lower()
     password = request.form.get('password', '')
     remember = request.form.get('remember')
-    
+
     errors = []
-    
+
     if not email:
         errors.append('Email is required')
     if not password:
         errors.append('Password is required')
-    
+
     if errors:
         return render_template('login.html', errors=errors, email=email)
-    
-    if email not in USERS_DATABASE:
-        errors.append('Invalid email or password')
+
+    # Use MongoDB
+    user_model = UserModel()
+    user = user_model.authenticate(email, password)
+
+    if not user:
+        errors.append("Invalid email or password")
         return render_template('login.html', errors=errors, email=email)
-    
-    user = USERS_DATABASE[email]
-    hashed_password = hashlib.sha256(password.encode()).hexdigest()
-    
-    if user['password'] != hashed_password:
-        errors.append('Invalid email or password')
-        return render_template('login.html', errors=errors, email=email)
-    
-    # Login successful
-    session['user_id'] = user['user_id']
-    session['username'] = user['fullname']
+
+    # Login successful → store in session
+    session['user_id'] = str(user["_id"])
+    session['username'] = user.get('fullname', '')
     session['email'] = user['email']
-    
+
     if remember:
         session.permanent = True
-    
+
     print(f"User logged in: {email}")
     return redirect('/')
-
-@auth_bp.route('/logout', methods=['POST'])
-def logout():
-    """Logout user"""
-    if 'user_id' not in session:
-        return jsonify({'success': False, 'error': 'Not logged in'}), 401
-    
-    session.clear()
-    print("User logged out")
-    return redirect('/')
-
-@auth_bp.route('/api/auth/status', methods=['GET'])
-def auth_status():
-    """Check if user is logged in"""
-    from utils.helpers import get_current_user
-    user_info = get_current_user()
-    return jsonify(user_info)
 
 # ============================================
 # PASSWORD RESET ROUTES
