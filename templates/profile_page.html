@@ -30,12 +30,18 @@
                 <div class="User_information">
                     <h3>User Information:</h3>
                     <ul>
-                        <li>Name: {{ user.username }}</li>
+                        <li>Name: {{ user.fullname }}</li>
                         <li>Email: {{ user.email }}</li>
-                        <li>Weight: Not set</li>
-                        <li>Allergies: Not set</li>
-                        <li>Prescriptions: Not set</li>
-                        <li>Gender: Not set</li>
+                        <li>Age: {{user.age}}</li>
+                        <li>Height: {{user.height}}cm</li>
+                        <li>Weight: {{user.weight}}t</li>
+                        <li>Allergies: {{user.allergies}}</li>
+                        <li>Prescriptions: {{user.medications}}</li>
+                        <li>Gender: {{user.gender}}</li>
+                        <li>Smoker: {{user.smoker}}</li>
+                        <li>Prior Medical Conditions: {{user.medical_conditions}}</li>
+                        <li>Alchohol: {{user.alcohol}}</li>
+
                     </ul>
                     <small style="color: #666; font-style: italic;">Click profile icon above to edit your information</small>
                 </div>
