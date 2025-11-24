@@ -100,6 +100,14 @@ def check_email():
 # ============================================
 # LOGIN ROUTES
 # ============================================
+@auth_bp.route('/login', methods=['GET'])
+def login_page():
+    """Show login page"""
+    if 'user_id' in session:
+        return redirect('/')
+    
+    signup_success = session.pop('signup_success', False)
+    return render_template('login.html', signup_success=signup_success)
 
 @auth_bp.route('/login', methods=['POST'])
 def login_submit():
@@ -133,9 +141,25 @@ def login_submit():
 
     if remember:
         session.permanent = True
-
     print(f"User logged in: {email}")
+
     return redirect('/')
+@auth_bp.route('/logout', methods=['POST'])
+def logout():
+    """Logout user"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+    
+    session.clear()
+    print("User logged out")
+    return redirect('/')
+
+@auth_bp.route('/api/auth/status', methods=['GET'])
+def auth_status():
+    """Check if user is logged in"""
+    from utils.helpers import get_current_user
+    user_info = get_current_user()
+    return jsonify(user_info)
 
 # ============================================
 # PASSWORD RESET ROUTES
