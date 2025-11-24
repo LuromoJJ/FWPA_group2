@@ -47,7 +47,7 @@
                 <ul>
                     {% for medicine in saved_medicines %}
                     <li>
-                        <a href="/medicine/{{ medicine.name.lower() }}" style="text-decoration: none; color: #333;">
+                        <a href="/medicine/{{ medicine.lower() }}" style="text-decoration: none; color: #333;">
                             {{ medicine.name }}
                         </a>
                     </li>
