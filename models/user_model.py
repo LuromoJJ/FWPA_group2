@@ -15,20 +15,24 @@ class UserModel:
         self.collection = self.db["user_prefs"]
 
     def create_user(self, user):
-        """Insert a new user document"""
+        """Insert a new user document with hashed password"""
+        user['email'] = user['email'].strip().lower()
+        user['password'] = hashlib.sha256(user['password'].encode()).hexdigest()
         return self.collection.insert_one(user).inserted_id
 
     def get_user_by_email(self, email):
-        """Retrieve a user by email"""
-        return self.collection.find_one({"email": email})
+        """Retrieve a user by email (case-insensitive)"""
+        return self.collection.find_one({"email": email.strip().lower()})
 
     def authenticate(self, email, password):
         """Check if email + password match"""
+        email = email.strip().lower()
         hashed_pw = hashlib.sha256(password.encode()).hexdigest()
         return self.collection.find_one({"email": email, "password": hashed_pw})
 
     def update_user(self, email, update_data):
         """Update user preferences/data"""
+        email = email.strip().lower()
         return self.collection.update_one(
             {"email": email},
             {"$set": update_data}
