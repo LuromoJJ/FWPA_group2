@@ -4,6 +4,8 @@ File: routes/profile_routes.py
 """
 
 from flask import Blueprint, render_template, request, jsonify, redirect, session
+from models.user_model import UserModel
+
 
 profile_bp = Blueprint('profile', __name__)
 
@@ -12,6 +14,8 @@ def profile_page():
     """Show and update user profile"""
     if 'user_id' not in session:
         return redirect('/login')
+    
+    user_model = UserModel()
 
     if request.method == 'GET':
         user_data = session.get('user_data', {
@@ -51,7 +55,8 @@ def profile_page():
 
         if not updated_data["email"] or "@" not in updated_data["email"]:
             return jsonify({'success': False, 'message': 'Invalid email'}), 400
-
+        user_model.update_user(session['email'], updated_data)
+        user_model.close()
         session['user_data'] = updated_data
 
         return jsonify({

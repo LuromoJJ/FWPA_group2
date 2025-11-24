@@ -5,6 +5,8 @@ File: app.py
 
 from flask import Flask
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # ============================================
 # FLASK APP INITIALIZATION
@@ -22,9 +24,8 @@ def create_app():
     app = Flask(__name__, 
                 template_folder=TEMPLATE_DIR,
                 static_folder=STATIC_DIR)
-    
-    app.secret_key = 'key123'  # Change this in production!
-    
+    app.secret_key = os.getenv("SECRET_KEY")
+
     # Debug: Print paths
     print(f"Template folder: {TEMPLATE_DIR}")
     print(f"Static folder: {STATIC_DIR}")

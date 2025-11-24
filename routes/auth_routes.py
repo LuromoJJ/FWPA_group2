@@ -17,86 +17,52 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/signup', methods=['GET'])
 def signup_page():
-    """Show signup page"""
     if 'user_id' in session:
         return redirect('/profile_page')
-    
     return render_template('signup.html')
+
 
 @auth_bp.route('/signup', methods=['POST'])
 def signup_submit():
-    """Create new account"""
     fullname = request.form.get('fullname', '').strip()
     email = request.form.get('email', '').strip().lower()
     password = request.form.get('password', '')
     confirm_password = request.form.get('confirm-password', '')
-    
+
     errors = []
-    
-    # Validation
-    if not fullname:
-        errors.append('Full name is required')
-    if not email:
-        errors.append('Email is required')
-    if not password:
-        errors.append('Password is required')
-    if not confirm_password:
-        errors.append('Please confirm your password')
-    
-    if fullname and (len(fullname) < 2 or len(fullname) > 100):
-        errors.append('Name must be between 2 and 100 characters')
-    
-    if email and '@' not in email:
-        errors.append('Invalid email format')
-    
-    if password and len(password) < 8:
-        errors.append('Password must be at least 8 characters')
-    
-    if password and confirm_password and password != confirm_password:
-        errors.append('Passwords do not match')
-    
+
+    if not fullname: errors.append('Full name is required')
+    if not email: errors.append('Email is required')
+    if not password: errors.append('Password is required')
+    if not confirm_password: errors.append('Please confirm your password')
+    if password != confirm_password: errors.append('Passwords do not match')
+    if '@' not in email: errors.append('Invalid email')
+    if len(password) < 8: errors.append('Password must be at least 8 characters')
+
     user_model = UserModel()
-    existing_user = user_model.get_user_by_email(email)
-    if existing_user:
+    if user_model.get_user_by_email(email):
         errors.append('Email already registered')
 
     if errors:
-        return render_template('signup.html', 
-                             errors=errors,
-                             fullname=fullname, 
-                             email=email)
-    #hash the password
-    hashed_pw = hashlib.sha256(password.encode()).hexdigest()
+        user_model.close()
+        return render_template('signup.html', errors=errors, fullname=fullname, email=email)
 
-    # Create user
+    # Hash password and create user
     user_doc = {
         'fullname': fullname,
         'email': email,
-        'password': hashed_pw
+        'password': password  # Hash inside UserModel
     }
     new_user_id = user_model.create_user(user_doc)
     user_model.close()
 
-    print(f"New user created: {email}")
-    
-    session['signup_success'] = True
-    return redirect('/login')
-# email check
-@auth_bp.route('/api/auth/check-email', methods=['GET'])
-def check_email():
-    """Check if email exists"""
-    email =  request.args.get('email', '').strip().lower()
-    
-    if not email:
-        return jsonify({'available': False, 'message': 'Email required'}), 400
-    user_model = UserModel()
-    exists = user_model.get_user_by_email(email) is not None
-    user_model.close()
-    if exists:
-        return jsonify({'available': False, 'message': 'Email already in use'})
-    
-    return jsonify({'available': True, 'message': 'Email is available'})
+    # Store session info
+    session['user_id'] = str(new_user_id)
+    session['email'] = email
+    session['fullname'] = fullname
 
+    # Redirect to extra info form
+    return redirect('/form')
 # ============================================
 # LOGIN ROUTES
 # ============================================

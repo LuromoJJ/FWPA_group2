@@ -65,3 +65,35 @@ function animateFormEntry() {
         }, 100);
     }
 }
+async function checkEmailAvailability(email) {
+    const emailInput = document.getElementById('email');
+    const formGroup = emailInput.closest('.form-group');
+    
+    // Remove previous availability message
+    const existingMsg = formGroup.querySelector('.availability-message');
+    if (existingMsg) existingMsg.remove();
+    
+    try {
+        const response = await fetch(`/api/auth/check-email?email=${encodeURIComponent(email)}`);
+        const data = await response.json();
+        
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'availability-message';
+        msgDiv.style.fontSize = '0.85rem';
+        msgDiv.style.marginTop = '5px';
+
+        if (data.available) {
+            msgDiv.style.color = '#28a745';
+            msgDiv.textContent = '✓ Email is available';
+            emailInput.style.borderColor = ''; // reset border
+        } else {
+            msgDiv.style.color = '#dc3545';
+            msgDiv.textContent = '✗ Email already in use';
+            emailInput.style.borderColor = '#dc3545';
+        }
+
+        formGroup.appendChild(msgDiv);
+    } catch (error) {
+        console.error('Error checking email:', error);
+    }
+}

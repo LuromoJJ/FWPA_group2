@@ -42,7 +42,7 @@ except Exception as e:
 # AUTHENTICATE
 print("\n3️⃣ Authenticating...")
 try:
-    auth = model.authenticate("test@example.com", "password123")
+    auth = model.authenticate("test@example.com", "1234")
     if auth:
         print("✅ Authentication successful")
     else:
