@@ -5,7 +5,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Medicine Info - {{ medicine.name }}</title>
-  <!-- ✅ FIXED: Use url_for for CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/medicine.css') }}" />
   <script src="{{ url_for('static', filename='js/medicine.js') }}"></script>
@@ -15,7 +14,6 @@
 <!-- Navbar -->
   <header class="navbar">
     <div class="logo">
-      <!-- ✅ FIXED: Use url_for for homepage -->
       <a href="{{ url_for('medicine.homepage') }}">
         <img src="/static/images/logo.png" alt="Logo">
         <span>MedInfo</span>
@@ -23,7 +21,6 @@
     </div>
     <nav class="nav-links" style="display: flex; align-items: center; gap: 15px;">
       {% if user.logged_in %}
-        <!-- Logged in: Show Profile icon (left) and Logout button (right) -->
         <a href="{{ url_for('profile.profile_page') }}" style="display: flex; flex-direction: column; align-items: center; text-decoration: none;">
           <img src="/static/images/Profile_icon.png" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%;">
           <span style="font-size: 0.75rem; color: #333; margin-top: 5px;">Go to your profile</span>
@@ -32,7 +29,6 @@
           <button type="submit" class="login-btn" style="background-color: #dc3545; border: none; cursor: pointer;">Logout</button>
         </form>
       {% else %}
-        <!-- Not logged in: Show Login button -->
         <a href="{{ url_for('auth.login_page') }}" class="login-btn">Login</a>
       {% endif %}
     </nav>
@@ -50,35 +46,33 @@
   <!-- Medicine Info Section -->
   <main class="medicine-info">
     <div class="medicine-header">
-      <h1>{{ medicine.name }}</h1>
-      
-      <!-- ✅ Show loading indicator if AI is generating -->
-      {% if 'being generated' in medicine.description %}
-        <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #ffc107;">
-          <h3 style="margin: 0 0 10px 0; color: #856404;">⏳ AI is generating information...</h3>
-          <p style="margin: 0; color: #856404;">This may take 1-3 minutes. Please wait...</p>
-          <div style="width: 100%; height: 6px; background-color: #e0e0e0; border-radius: 3px; margin-top: 10px; overflow: hidden;">
-            <div style="width: 0%; height: 100%; background-color: #ffc107; animation: loading 2s infinite;"></div>
-          </div>
-          <style>
-            @keyframes loading {
-              0% { width: 0%; }
-              50% { width: 70%; }
-              100% { width: 100%; }
-            }
-          </style>
-        </div>
-      {% endif %}
+      <div>
+        <h1>{{ medicine.name }}</h1>
+        {% if review_count > 0 %}
+          <p style="color: #ffc107; font-size: 1.2rem;">⭐ {{ average_rating }}/5 ({{ review_count }} reviews)</p>
+        {% endif %}
+      </div>
       
       {% if user.logged_in %}
-        <form method="POST" action="{{ url_for('medicine.add_medicine_to_profile') }}" style="display: inline;">
-          <input type="hidden" name="medicine_name" value="{{ medicine.name.lower() }}">
-          <button type="submit" class="add-profile-btn">+ Add to My Profile</button>
-        </form>
+        <div style="display: flex; gap: 10px;">
+          <button class="favorite-btn" onclick="toggleFavorite('{{ medicine.name.lower() }}')">
+            {% if is_favorited %}❤️{% else %}🤍{% endif %}
+          </button>
+          <form method="POST" action="{{ url_for('medicine.add_medicine_to_profile') }}" style="display: inline;">
+            <input type="hidden" name="medicine_name" value="{{ medicine.name.lower() }}">
+            <button type="submit" class="add-profile-btn">+ Add to Profile</button>
+          </form>
+        </div>
       {% else %}
         <a href="{{ url_for('auth.login_page') }}" class="add-profile-btn">Login to Save</a>
       {% endif %}
     </div>
+
+    {% if '🤖' in medicine.description %}
+      <div style="background: #fff3cd; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+        <p style="margin: 0;">⏳ AI is generating information... Please wait...</p>
+      </div>
+    {% endif %}
 
     <div class="medicine-description">
       <p>{{ medicine.description }}</p>
@@ -96,32 +90,91 @@
       </div>
     </div>
 
-    <!-- PubMed section -->
     <div class="pubmed-link">
-      <p>
-        For more details, see 
-        <a href="{{ medicine.pubmed_link }}" target="_blank">
-          official PubMed entries for {{ medicine.name }}.
-        </a>
-      </p>
+      <p>For more details, see <a href="{{ medicine.pubmed_link }}" target="_blank">PubMed entries</a></p>
     </div>
+
+    <!-- Reviews Section -->
+    <div style="margin-top: 3rem; padding-top: 2rem; border-top: 2px solid #ddd;">
+      <h2>Reviews</h2>
+      
+      {% if user.logged_in %}
+        <div class="review-form">
+          <h3>Write a Review</h3>
+          <div style="margin-bottom: 15px;">
+            <span id="stars" style="font-size: 2rem; cursor: pointer; color: #ddd;">
+              <span onclick="rate(1)">★</span>
+              <span onclick="rate(2)">★</span>
+              <span onclick="rate(3)">★</span>
+              <span onclick="rate(4)">★</span>
+              <span onclick="rate(5)">★</span>
+            </span>
+          </div>
+          <textarea id="reviewText" placeholder="Your review..." style="width: 100%; padding: 10px; min-height: 80px; border-radius: 8px; border: 1px solid #ddd;"></textarea>
+          <button onclick="submitReview()" class="add-profile-btn" style="margin-top: 10px;">Submit</button>
+        </div>
+      {% endif %}
+
+      {% for review in reviews %}
+        <div class="review-card">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+            <div>
+              <strong>{{ review.user_email.split('@')[0] }}</strong>
+              <span style="color: #ffc107; margin-left: 10px;">{% for i in range(review.rating) %}★{% endfor %}</span>
+            </div>
+            <small style="color: #666;">{{ review.created_at.strftime('%B %d, %Y') if review.created_at else 'Recent' }}</small>
+          </div>
+          <p style="margin: 0;">{{ review.review_text }}</p>
+        </div>
+      {% endfor %}
+    </div>
+
   </main>
 
-  <!-- Footer -->
   <footer class="footer">
     <p>© 2025 Medicine Explainer & Reminder. All rights reserved.</p>
   </footer>
 
-  <script src="{{ url_for('static', filename='js/medicine.js') }}"></script>
-  
-  <!-- Auto-refresh if AI is still generating -->
-  {% if 'being generated' in medicine.description %}
   <script>
-    console.log('AI is generating... will refresh in 10 seconds');
-    setTimeout(function() {
-      console.log('Refreshing page to check if AI is done...');
-      location.reload();
-    }, 10000); // Refresh every 10 seconds
+    let rating = 0;
+    
+    function rate(r) {
+      rating = r;
+      const stars = document.getElementById('stars').children;
+      for (let i = 0; i < 5; i++) {
+        stars[i].style.color = i < r ? '#ffc107' : '#ddd';
+      }
+    }
+
+    async function submitReview() {
+      if (rating === 0) return alert('Select a rating!');
+      const text = document.getElementById('reviewText').value;
+      if (!text) return alert('Write a review!');
+      
+      const formData = new FormData();
+      formData.append('medicine_name', '{{ medicine.name.lower() }}');
+      formData.append('rating', rating);
+      formData.append('review_text', text);
+      
+      const response = await fetch('/review/add', { method: 'POST', body: formData });
+      const data = await response.json();
+      if (data.success) location.reload();
+      else alert(data.message);
+    }
+
+    async function toggleFavorite(name) {
+      const formData = new FormData();
+      formData.append('medicine_name', name);
+      const url = '{{ "/favorites/add" if not is_favorited else "/favorites/remove" }}';
+      const response = await fetch(url, { method: 'POST', body: formData });
+      if ((await response.json()).success) location.reload();
+    }
+
+  </script>
+
+  {% if '🤖' in medicine.description %}
+  <script>
+    setTimeout(() => location.reload(), 10000);
   </script>
   {% endif %}
 
