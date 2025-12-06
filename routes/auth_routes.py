@@ -140,8 +140,22 @@ def forgot_password_page():
 def forgot_password_submit():
     """Handle forgot password submission"""
     email = request.form.get('email', '').strip().lower()
-    # Logic to send reset link would go here
-    return jsonify({'success': True, 'message': 'Password reset link sent to your email'})
+
+    user_model = UserModel()
+    user = user_model.get_user_by_email(email)
+    user_model.close()
+
+    if not user:
+        return jsonify({'success': False, 'message': 'Email not found'}), 400
+
+    # Generate token
+    from utils.helpers import generate_reset_token, send_reset_email
+    token = generate_reset_token(email)
+
+    # Send email
+    send_reset_email(email, token)
+
+    return jsonify({'success': True, 'message': 'Password reset email sent'})
 
 @auth_bp.route('/set_new_password/<token>', methods=['GET'])
 def reset_password_page(token):
@@ -151,6 +165,7 @@ def reset_password_page(token):
         return "Invalid or expired token", 400
     
     return render_template('set_new_password.html', token=token)
+    
 
 @auth_bp.route('/set_new_password/<token>', methods=['POST'])
 def reset_password_submit(token):
