@@ -5,7 +5,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Medicine Explainer & Reminder</title>
-  <!-- ✅ FIXED: Use url_for for CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
   <script src="{{ url_for('static', filename='js/homepage.js') }}"></script>
 </head>
@@ -14,16 +13,13 @@
   <!-- Header -->
   <header class="navbar">
     <div class="logo">
-      <!-- ✅ FIXED: Use url_for for homepage link -->
       <a href="{{ url_for('medicine.homepage') }}">
-        <!-- ✅ FIXED: Use url_for for images -->
         <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Medicine Explainer Logo">
         <span>MedInfo</span>
       </a>
     </div>
     <nav class="nav-links" style="display: flex; align-items: center; gap: 15px;">
       {% if user.logged_in %}
-        <!-- Logged in: Show Profile icon and Logout button -->
         <a href="{{ url_for('profile.profile_page') }}" style="display: flex; flex-direction: column; align-items: center; text-decoration: none;">
           <img src="{{ url_for('static', filename='images/Profile_icon.png') }}" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%;">
           <span style="font-size: 0.75rem; color: #333; margin-top: 5px;">Go to your profile</span>
@@ -32,7 +28,6 @@
           <button type="submit" class="login-btn" style="background-color: #dc3545; border: none; cursor: pointer;">Logout</button>
         </form>
       {% else %}
-        <!-- Not logged in: Show Login button -->
         <a href="{{ url_for('auth.login_page') }}" class="login-btn">Login</a>
       {% endif %}
     </nav>
@@ -51,12 +46,77 @@
       />
       <button type="submit">Search</button>
     </form>
+
+    <!-- ✅ NEW: Quick Access Section (only for logged-in users) -->
+    {% if user.logged_in %}
+    <div style="max-width: 800px; margin: 3rem auto; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+      
+      <!-- Recent Searches -->
+      <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h3 style="margin: 0 0 1rem 0; color: var(--green-dark);">🔍 Recent Searches</h3>
+        <div id="historyList">
+          <p style="color: #999;">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Favorites -->
+      <div style="background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h3 style="margin: 0 0 1rem 0; color: var(--green-dark);">❤️ My Favorites</h3>
+        <div id="favoritesList">
+          <p style="color: #999;">Loading...</p>
+        </div>
+      </div>
+
+    </div>
+    {% endif %}
+
   </main>
 
   <!-- Footer -->
   <footer>
     <p>© 2025 Medicine Explainer & Reminder. All rights reserved.</p>
   </footer>
+
+  {% if user.logged_in %}
+  <script>
+    // Load search history
+    fetch('/api/search-history')
+      .then(r => r.json())
+      .then(data => {
+        const list = document.getElementById('historyList');
+        if (data.success && data.history.length > 0) {
+          list.innerHTML = data.history.slice(0, 5).map(item => `
+            <div style="padding: 10px; margin-bottom: 8px; background: #f9f9f9; border-radius: 8px;">
+              <a href="/medicine/${item.medicine_name}" style="text-decoration: none; color: var(--green-dark); font-weight: bold;">
+                ${item.medicine_name.charAt(0).toUpperCase() + item.medicine_name.slice(1)}
+              </a>
+              <small style="display: block; color: #666;">Searched ${item.search_count}x</small>
+            </div>
+          `).join('');
+        } else {
+          list.innerHTML = '<p style="color: #999;">No searches yet</p>';
+        }
+      });
+
+    // Load favorites
+    fetch('/api/favorites')
+      .then(r => r.json())
+      .then(data => {
+        const list = document.getElementById('favoritesList');
+        if (data.success && data.favorites.length > 0) {
+          list.innerHTML = data.favorites.slice(0, 5).map(fav => `
+            <div style="padding: 10px; margin-bottom: 8px; background: #f9f9f9; border-radius: 8px;">
+              <a href="/medicine/${fav.medicine_name}" style="text-decoration: none; color: #e91e63; font-weight: bold;">
+                ${fav.medicine_name.charAt(0).toUpperCase() + fav.medicine_name.slice(1)}
+              </a>
+            </div>
+          `).join('');
+        } else {
+          list.innerHTML = '<p style="color: #999;">No favorites yet</p>';
+        }
+      });
+  </script>
+  {% endif %}
 
 </body>
 </html>

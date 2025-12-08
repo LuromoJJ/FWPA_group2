@@ -22,9 +22,16 @@ def generate_medicine_info(medicine_name):
     """
     
     # Create simple, clear prompt for AI
-    prompt = f"""You are helping someone who just bought {medicine_name} from a pharmacy and wants to understand it better.
+    prompt = f"""You are a pharmacy assistant helping someone understand {medicine_name}.
 
-Write information that a 16-year-old can easily understand. Use simple words, short sentences, and be very clear.
+TRUSTED MEDICAL SOURCES TO REFERENCE:
+- drugs.com - Comprehensive drug database with patient information
+- webmd.com - Trusted medical information for patients
+- mayoclinic.org - Reliable health information from Mayo Clinic
+- medlineplus.gov - Official U.S. government health information
+- rxlist.com - Detailed prescription drug information
+
+Base your response on the type of information found on these trusted medical websites. Provide accurate, verified information that a 16-year-old can easily understand. Use simple words, short sentences, and be very clear.
 
 IMPORTANT FORMAT RULES:
 - For "advice" and "warning": Write as plain text with each bullet point on a NEW LINE
@@ -43,8 +50,8 @@ Respond ONLY with this JSON format (no extra text):
 EXAMPLE of correct format:
 "advice": "• Take with a full glass of water\\n• Take at the same time each day\\n• Don't skip doses\\n• Finish the full course"
 
-Each bullet point should be one clear, short sentence. Focus on the most important practical information."""
-
+Each bullet point should be one clear, short sentence. Focus on the most important practical information found on trusted medical websites."""
+    
     try:
         print(f"🤖 Calling LM Studio for: {medicine_name}")
         
