@@ -4,8 +4,7 @@ File: routes/auth_routes.py
 """
 
 from flask import Blueprint, render_template, request, jsonify, redirect, session
-import hashlib
-from models.user_model import UserModel
+from models.user_model import DB
 from utils.helpers import validate_reset_token, invalidate_reset_token, update_user_password
 
 # Create Blueprint
@@ -39,25 +38,29 @@ def signup_submit():
     if '@' not in email: errors.append('Invalid email')
     if len(password) < 8: errors.append('Password must be at least 8 characters')
 
-    user_model = UserModel()
+    db = DB()
+    login_model = db.logins  
+    user_model = db.users     
+
     if user_model.get_user_by_email(email):
         errors.append('Email already registered')
 
     if errors:
-        user_model.close()
+        db.close()
         return render_template('signup.html', errors=errors, fullname=fullname, email=email)
 
-    # Hash password and create user
+    # Create login credentials
+    login_model.create_login(email, password)  
+
+    # Optionally store extra info in users collection
     user_doc = {
         'fullname': fullname,
         'email': email,
-        'password': password  # Hash inside UserModel
     }
-    new_user_id = user_model.create_user(user_doc)
-    user_model.close()
+    user_model.create_user(user_doc)
 
-    # Store session info
-    session['user_id'] = str(new_user_id)
+    db.close()
+    session['user_id'] = email
     session['email'] = email
     session['fullname'] = fullname
 
@@ -93,8 +96,10 @@ def login_submit():
         return render_template('login.html', errors=errors, email=email)
 
     # Use MongoDB
-    user_model = UserModel()
-    user = user_model.authenticate(email, password)
+    db = DB()
+    login_model = db.logins
+    user = login_model.authenticate(email, password)
+    db.close()
 
     if not user:
         errors.append("Invalid email or password")
@@ -141,10 +146,10 @@ def forgot_password_submit():
     """Handle forgot password submission"""
     email = request.form.get('email', '').strip().lower()
 
-    user_model = UserModel()
-    user = user_model.get_user_by_email(email)
-    user_model.close()
-
+    db = DB()
+    login_model = db.logins
+    user = login_model.get_user_by_email(email)
+    db.close()
     if not user:
         return jsonify({'success': False, 'message': 'Email not found'}), 400
 

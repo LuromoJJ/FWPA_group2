@@ -5,45 +5,109 @@ import os
 
 load_dotenv()
 
+# ------------------------
+# USER MODEL
+# ------------------------
 class UserModel:
-    def __init__(self):
-        self.mongo_uri = os.getenv("MONGO_URI")
-        if not self.mongo_uri:
-            raise ValueError("MONGO_URI not set in environment")
-
-        # Single MongoClient
-        self.client = MongoClient(self.mongo_uri)
-        self.db = self.client["MedInfo"]
-        self.collection = self.db["User_prefs"] 
-
-        print("DEBUG MONGO_URI:", self.mongo_uri)
-        print("DEBUG DATABASES:", self.client.list_database_names())
-        print("DEBUG DB:", self.db.name)
-        print("DEBUG COLLECTION:", self.collection.name)
+    def __init__(self, collection):
+        self.collection = collection
 
     def create_user(self, user):
-        user['email'] = user['email'].strip().lower()
-        # Hash password here only once
-        user['password'] = hashlib.sha256(user['password'].encode()).hexdigest()
-        print("DEBUG INSERT USER:", user)
-        result = self.collection.insert_one(user)
-        print("DEBUG INSERTED ID:", result.inserted_id)
-        return result.inserted_id
+        user["email"] = user["email"].strip().lower()
+        return self.collection.insert_one(user).inserted_id
 
     def get_user_by_email(self, email):
         return self.collection.find_one({"email": email.strip().lower()})
+
+    def update_user(self, email, update_data):
+        email = email.strip().lower()
+        return self.collection.update_one({"email": email}, {"$set": update_data})
+
+
+# ------------------------
+# LOGIN MODEL
+# ------------------------
+class LoginModel:
+    def __init__(self, collection):
+        self.collection = collection
+
+    def create_login(self, email, password):
+        email = email.strip().lower()
+        hashed_pw = hashlib.sha256(password.encode()).hexdigest()
+
+        login_doc = {"email": email, "password": hashed_pw}
+        return self.collection.insert_one(login_doc).inserted_id
 
     def authenticate(self, email, password):
         email = email.strip().lower()
         hashed_pw = hashlib.sha256(password.encode()).hexdigest()
         return self.collection.find_one({"email": email, "password": hashed_pw})
 
-    def update_user(self, email, update_data):
+    def update_password(self, email, new_password):
         email = email.strip().lower()
+        hashed_pw = hashlib.sha256(new_password.encode()).hexdigest()
         return self.collection.update_one(
             {"email": email},
-            {"$set": update_data}
+            {"$set": {"password": hashed_pw}}
         )
+
+
+# ------------------------
+# SAVED MEDICATION MODEL
+# ------------------------
+class SavedMedsModel:
+    def __init__(self, collection):
+        self.collection = collection
+
+    def save_medication(self, email, medication):
+        email = email.strip().lower()
+        entry = {"email": email, "medication": medication}
+        return self.collection.insert_one(entry).inserted_id
+
+
+# ------------------------
+# SCHEDULED MEDS MODEL
+# ------------------------
+class ScheduledMedsModel:
+    def __init__(self, collection):
+        self.collection = collection
+
+    def schedule_medication(self, email, medication, schedule_time):
+        email = email.strip().lower()
+        entry = {
+            "email": email,
+            "medication": medication,
+            "schedule_time": schedule_time
+        }
+        return self.collection.insert_one(entry).inserted_id
+
+    def get_schedule_by_email(self, email):
+        email = email.strip().lower()
+        return list(self.collection.find({"email": email}))
+
+
+# ------------------------
+# DB WRAPPER
+# ------------------------
+class DB:
+    def __init__(self):
+        mongo_uri = os.getenv("MONGO_URI")
+        if not mongo_uri:
+            raise ValueError("MONGO_URI not set in environment")
+
+        self.client = MongoClient(mongo_uri)
+        db = self.client["MedInfo"]
+
+        self.users = UserModel(db["User_info"])
+        self.logins = LoginModel(db["Login_info"])
+        self.saved_meds = SavedMedsModel(db["Saved_meds"])
+        self.scheduled_meds = ScheduledMedsModel(db["Scheduled_meds"])
+
+    def authenticate_user(self, email, password):
+        return self.logins.authenticate(email, password)
+
+    def get_user_by_email(self, email):
+        return self.users.get_user_by_email(email)
 
     def close(self):
         self.client.close()

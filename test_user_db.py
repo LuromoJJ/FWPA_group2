@@ -1,6 +1,5 @@
 from models.user_model import UserModel
 from dotenv import load_dotenv
-import hashlib
 import json
 
 load_dotenv()

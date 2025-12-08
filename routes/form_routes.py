@@ -3,7 +3,7 @@ Form Routes - Medical Information Form
 File: routes/form_routes.py
 """
 from flask import Blueprint, render_template, request, session, redirect, jsonify
-from models.user_model import UserModel
+from models.user_model import DB
 
 form_bp = Blueprint('form', __name__)
 
@@ -12,9 +12,10 @@ def form_page():
     if 'email' not in session:
         return redirect('/signup')
 
-    user_model = UserModel()
+    db = DB()
+    user_model = db.users
     user = user_model.get_user_by_email(session['email'])
-    user_model.close()
+    db.close()
 
     return render_template('form.html', user=user)
 
@@ -37,8 +38,16 @@ def form_submit():
         "medical_conditions": request.form.get("medical_conditions")
     }
 
-    user_model = UserModel()
+    db = DB()
+    user_model = db.users
     user_model.update_user(email, form_data)
-    user_model.close()
 
+    medications = request.form.get("medications", "").strip()
+    if medications:
+        meds_list = [m.strip() for m in medications.split(",") if m.strip()]
+        saved_meds_model = db.saved_meds
+        for med in meds_list:
+            saved_meds_model.save_medication(email, med)
+
+    db.close()
     return redirect('/profile_page')

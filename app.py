@@ -38,7 +38,9 @@ def create_app():
     from routes.medicine_routes import medicine_bp
     from routes.profile_routes import profile_bp
     from routes.form_routes import form_bp
-    
+    from routes.calender_routes import calender_bp
+
+    app.register_blueprint(calender_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(medicine_bp)
     app.register_blueprint(profile_bp)
@@ -76,6 +78,7 @@ if __name__ == '__main__':
     print("Form: http://localhost:5000/form")
     print("Forgot Password: http://localhost:5000/forgot_password")
     print("Set new Password: http://localhost:5000/set_new_password/<token>")
+    print("Calendar: http://localhost:5000/calendar")
     print("\nPress CTRL+C to stop\n")
     
     app.run(debug=True, host='0.0.0.0', port=5000)

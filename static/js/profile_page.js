@@ -5,8 +5,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const savedMedicineList = document.querySelector(".saved-medicines ul");
     const warningsList = document.querySelector(".Warnings ul");
 
-
-
     /* edit profile icon */
     profileIcon.addEventListener("click", function (event){
         messageBox.textContent = "Redirecting to edit profile...";
@@ -22,7 +20,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     checkUserInfo();
 
-    
 
 /* attach Event List */
 function attachEventListeners() {

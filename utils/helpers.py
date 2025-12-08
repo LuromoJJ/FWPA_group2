@@ -2,10 +2,10 @@
 Helper Functions and Utilities
 File: utils/helpers.py
 """
-
+import os
 from flask import session
 from models.database import RESET_TOKENS, USERS_DATABASE
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # ============================================
 # USER SESSION HELPERS
@@ -25,7 +25,21 @@ def get_current_user():
 # ============================================
 # PASSWORD RESET TOKEN HELPERS
 # ============================================
+def generate_reset_token(email):
+    """Generate a secure reset token using os.urandom"""
+    token = os.urandom(32).hex()  # 64-char hex token
+    RESET_TOKENS[token] = {
+        "email": email,
+        "expires": datetime.now() + timedelta(minutes=30)
+    }
+    return token
 
+def send_reset_email(email, token):
+    """Simulate sending a password reset email"""
+    reset_link = f"http://example.com/reset_password?token={token}"
+    print(f"Sending password reset email to {email}")
+    print(f"Reset link: {reset_link}")
+    
 def validate_reset_token(token):
     """Check if reset token is valid and not expired"""
     token_data = RESET_TOKENS.get(token)
