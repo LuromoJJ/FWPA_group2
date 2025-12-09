@@ -63,6 +63,10 @@ class SavedMedsModel:
         email = email.strip().lower()
         entry = {"email": email, "medication": medication}
         return self.collection.insert_one(entry).inserted_id
+    def get_meds_by_email(self, email):
+        """Fetch all saved medicines for a given user email"""
+        email = email.strip().lower()
+        return list(self.collection.find({"email": email}))
 
 
 # ------------------------
