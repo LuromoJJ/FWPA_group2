@@ -38,9 +38,9 @@ def create_app():
     from routes.medicine_routes import medicine_bp
     from routes.profile_routes import profile_bp
     from routes.form_routes import form_bp
-    from routes.calender_routes import calender_bp
+    from routes.calendar_routes import calendar_bp
 
-    app.register_blueprint(calender_bp)
+    app.register_blueprint(calendar_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(medicine_bp)
     app.register_blueprint(profile_bp)

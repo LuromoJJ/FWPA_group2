@@ -34,7 +34,7 @@
                         <li>Email: {{ user.email }}</li>
                         <li>Age: {{user.age}}</li>
                         <li>Height: {{user.height}}cm</li>
-                        <li>Weight: {{user.weight}}t</li>
+                        <li>Weight: {{user.weight}}kg</li>
                         <li>Allergies: {{user.allergies}}</li>
                         <li>Prior Medical Conditions: {{user.medical_conditions}}</li>
                     </ul>
@@ -68,7 +68,7 @@
             </div>
         </div>
         
-        <div class="Calendar" href="calendar.html">  
+        <div class="Calendar" onclick="location.href='/calendar';" style="cursor: pointer;">  
             <h3>Medicine Schedule🗓️:</h3>
             <ul>
                 <li>No scheduled medicines yet.</li>

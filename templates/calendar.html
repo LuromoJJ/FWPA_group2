@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar</title>
+    <link rel="stylesheet" href="../static/css/styles.css">
+</head>
+<body>
+    <header>
+        <div class="header_seperator_profile">
+            <div class="logo">
+                <a href="/homepage">
+                    <img src="../static/images/logo.png" alt="Medicine Explainer Logo">
+                    <span>MedInfo</span>
+                </a>
+            </div>
+            <div class="profile-header">
+                <h2>My Medicine Calendar</h2>
+            </div>
+        </div>
+    </header>
+    <div class="calendar-add-button-container">
+        <a href="{{ url_for('calendar.add_schedule') }}" class="calendar-add-button">
+            + Add Medicine Schedule
+        </a>
+    </div>
+
+    <div class="calendar-container" id="calendar-container"
+    data-schedule='{{ schedule | tojson | safe }}'>
+   <div class="calendar-header">
+       <button class="calendar-prev">⬅</button>
+       <h2 id="calendar-month"></h2>
+       <button class="calendar-next">➡</button>
+   </div>
+   <div class="calendar-grid" id="calendar-grid"></div>
+</div>
+
+<script src="../static/js/calendar.js"></script>
+   
+</body>
+</html>
