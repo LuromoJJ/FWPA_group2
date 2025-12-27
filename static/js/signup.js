@@ -55,21 +55,33 @@ function setupEmailAvailabilityCheck(emailInput) {
     });
 }
 
+
 async function checkEmailAvailability(email) {
     const emailInput = document.getElementById('email');
     const formGroup = emailInput.closest('.form-group');
-    
+
+    const oldMsg = formGroup.querySelector('.availability-message');
+    if (oldMsg) oldMsg.remove();
+
+    emailInput.style.borderColor = '';
+
     try {
         const response = await fetch(`/api/auth/check-email?email=${encodeURIComponent(email)}`);
         const data = await response.json();
-        
-        // Create availability message
+
+        console.log('Email check response:', data);
+
         const msgDiv = document.createElement('div');
         msgDiv.className = 'availability-message';
         msgDiv.style.fontSize = '0.85rem';
         msgDiv.style.marginTop = '5px';
-        
-        if (data.available) {
+
+        const isTaken =
+            data === true ||
+            data?.exists === true ||
+            data?.available === false;
+
+        if (!isTaken) {
             msgDiv.style.color = '#28a745';
             msgDiv.textContent = '✓ Email is available';
         } else {
@@ -77,13 +89,12 @@ async function checkEmailAvailability(email) {
             msgDiv.textContent = '✗ Email already in use';
             emailInput.style.borderColor = '#dc3545';
         }
-        
+
         formGroup.appendChild(msgDiv);
     } catch (error) {
         console.error('Error checking email:', error);
     }
 }
-
 /**
  * ✅ Password Strength Indicator
  */
@@ -139,7 +150,7 @@ function updatePasswordStrength(password) {
 }
 
 /**
- * ✅ Password Match Validation
+ *  Password Match Validation
  */
 function setupPasswordMatch(passwordInput, confirmPasswordInput) {
     confirmPasswordInput.addEventListener('input', function() {
