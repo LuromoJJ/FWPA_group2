@@ -91,14 +91,14 @@ def medicine_details(name):
     
     # Medicine not found - need AI to generate it
     status = ai_status.get(medicine_name, 'new')
-    
+
     if status == 'new':
         # First time - start AI generation
         ai_status[medicine_name] = 'working'
         thread = threading.Thread(target=generate_ai_info, args=(medicine_name,))
         thread.daemon = True
         thread.start()
-    
+
     # Show loading message
     loading_data = {
         'name': name.replace('-', ' ').title(),
@@ -107,9 +107,15 @@ def medicine_details(name):
         'warning': '💡 Make sure LM Studio is running!',
         'pubmed_link': f'https://pubmed.ncbi.nlm.nih.gov/?term={name.replace("-", "+")}'
     }
-    
+
     user_info = get_current_user()
-    return render_template('medicine.html', medicine=loading_data, user=user_info)
+    return render_template('medicine.html', 
+                        medicine=loading_data, 
+                        user=user_info,
+                        is_favorited=False,
+                        reviews=[],
+                        average_rating=0,
+                        review_count=0)
 
 # Background function to generate medicine info
 def generate_ai_info(medicine_name):
