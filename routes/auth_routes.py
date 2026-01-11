@@ -3,13 +3,17 @@ Authentication Routes - Login, Signup, Password Reset
 File: routes/auth_routes.py
 """
 
-from flask import Blueprint, render_template, request, jsonify, redirect, session
-from models.user_model import DB
+from flask import Blueprint, render_template, request, jsonify, redirect, session, url_for
+from models.user_model import DB, LoginModel
 from utils.helpers import validate_reset_token, invalidate_reset_token, update_user_password
 
 # Create Blueprint
 auth_bp = Blueprint('auth', __name__)
 
+def update_user_password(email, new_password):
+    db = DB()  # open DB connection
+    db.logins.update_password(email, new_password)  # calls the method above
+    db.close()  # close connection
 # ============================================
 # SIGNUP ROUTES
 # ============================================
@@ -147,20 +151,19 @@ def forgot_password_submit():
     email = request.form.get('email', '').strip().lower()
 
     db = DB()
-    login_model = db.logins
-    user = login_model.get_user_by_email(email)
+    user_model = db.logins
+    user = user_model.get_user_by_email(email)
     db.close()
     if not user:
-        return jsonify({'success': False, 'message': 'Email not found'}), 400
+        return render_template('forgot_password.html', error="Email not found")
 
     # Generate token
-    from utils.helpers import generate_reset_token, send_reset_email
-    token = generate_reset_token(email)
+    from utils.helpers import generate_reset_token
+    token = generate_reset_token(user['email'])
 
-    # Send email
-    send_reset_email(email, token)
+    # Redirect to the reset page with token in URL
+    return redirect(url_for('auth.reset_password_page', token=token))
 
-    return jsonify({'success': True, 'message': 'Password reset email sent'})
 
 @auth_bp.route('/set_new_password/<token>', methods=['GET'])
 def reset_password_page(token):
@@ -169,31 +172,35 @@ def reset_password_page(token):
     if not user_email:
         return "Invalid or expired token", 400
     
+    # Render template directly
     return render_template('set_new_password.html', token=token)
     
 
 @auth_bp.route('/set_new_password/<token>', methods=['POST'])
 def reset_password_submit(token):
     """Handle password reset"""
-    email = request.form.get('email', '').strip()
-    new_password = request.form.get('new_password', '').strip()
-    confirm_password = request.form.get('confirm_password', '').strip()
+    
     
     errors = []
+    email = validate_reset_token(token)
+    if not email:
+        return jsonify({'success': False, 'error': 'Invalid or expired token'}), 400
     
-    user_email = validate_reset_token(token)
-    if not user_email or user_email != email:
-        errors.append("Invalid or expired token")
-    
+    new_password = request.form.get('new_password', '').strip()
+    confirm_password = request.form.get('confirm_password', '').strip()
+
     if not new_password or len(new_password) < 8:
         errors.append("Password must be at least 8 characters long")
     if new_password != confirm_password:
         errors.append("Passwords do not match")
     
     if errors:
-        return jsonify({'success': False, 'errors': errors}), 400
-    
+        # render the same page with errors
+        return render_template('set_new_password.html', token=token, errors=errors)
+
+    # update password
     update_user_password(email, new_password)
     invalidate_reset_token(token)
-    
-    return jsonify({'success': True, 'message': 'Password updated successfully'})
+
+    # redirect to login page
+    return redirect(url_for('auth.login_page'))

@@ -37,6 +37,9 @@ class LoginModel:
 
         login_doc = {"email": email, "password": hashed_pw}
         return self.collection.insert_one(login_doc).inserted_id
+    
+    def get_user_by_email(self, email):
+        return self.collection.find_one({"email": email.strip().lower()})
 
     def authenticate(self, email, password):
         email = email.strip().lower()
